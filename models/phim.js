@@ -75,13 +75,11 @@ class PhimModel {
     }
 
     // Xóa phim
-    async delete(id) {
+    async hide(id) {
         const pool = await poolPromise;
-        // Lưu ý: Nếu phim đã có suất chiếu, SQL sẽ báo lỗi khóa ngoại. 
-        // Bạn nên xóa Suất chiếu của phim này trước nếu muốn xóa tuyệt đối.
         return await pool.request()
             .input('id', sql.Int, id)
-            .query("DELETE FROM PHIM WHERE MA_PHIM = @id");
+            .query("UPDATE PHIM SET TRANG_THAI = 0 WHERE MA_PHIM = @id");
     }
     // Thêm vào bên trong class PhimModel (file models/phim.js)
     // Lấy các phim mà User đã mua vé thành công

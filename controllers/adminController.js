@@ -25,23 +25,54 @@ class AdminController {
 
     async addPhim(req, res) {
         try {
-            const { ten, trailer, noidung, tuoi, thoiluong, daodien, dienvien, poster, nen, maTL } = req.body;
-            await phimModel.create({ ten, trailer, noidung, tuoi, thoiluong, daodien, dienvien, poster, nen, maTL });
-            res.redirect('/admin/phim');
+            // 1. Lấy tất cả dữ liệu chữ và link từ body
+            const {
+                ten, trailer, noidung, tuoi, thoiluong,
+                daodien, dienvien, maTL, posterLink, nenLink
+            } = req.body;
+
+            // 2. Xử lý Poster: Ưu tiên lấy File upload, nếu không có thì lấy Link
+            let poster = posterLink; // Mặc định là link Duy dán vào
+            if (req.files && req.files['posterFile']) {
+                poster = `/image/${req.files['posterFile'][0].filename}`;
+            }
+
+            // 3. Xử lý Ảnh nền: Ưu tiên lấy File upload, nếu không có thì lấy Link
+            let nen = nenLink; // Mặc định là link Duy dán vào
+            if (req.files && req.files['nenFile']) {
+                nen = `/image/${req.files['nenFile'][0].filename}`;
+            }
+
+            // 4. Kiểm tra dữ liệu bắt buộc (Tránh để trống cả link và file)
+            if (!poster || !nen) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Vui lòng cung cấp ảnh Poster và ảnh Nền (Link hoặc File)!"
+                });
+            }
+
+            // 5. Gọi model để lưu vào SQL Server
+            await phimModel.create({
+                ten, trailer, noidung, tuoi, thoiluong,
+                daodien, dienvien, poster, nen, maTL
+            });
+
+            res.json({ success: true, message: "Thêm phim mới thành công!" });
+
         } catch (error) {
-            console.error("Lỗi SQL khi thêm phim:", error.message);
-            res.status(500).send("Lỗi SQL: " + error.message);
+            console.error("Lỗi khi thêm phim:", error.message);
+            res.status(500).json({ success: false, message: "Lỗi hệ thống: " + error.message });
         }
     }
 
-    async deletePhim(req, res) {
+    async hidePhim(req, res) {
         try {
-            const id = req.params.id;
-            await phimModel.delete(id);
-            res.json({ success: true });
+            const { id } = req.params;
+            await phimModel.hide(id); // Gọi hàm hide vừa tạo
+            res.json({ success: true, message: "Đã ẩn phim khỏi danh sách hiển thị!" });
         } catch (error) {
-            console.error("Lỗi xóa phim:", error.message);
-            res.status(500).json({ success: false, message: "Không thể xóa phim này vì đã có suất chiếu!" });
+            console.error("Lỗi khi ẩn phim:", error.message);
+            res.status(500).json({ success: false, message: "Không thể ẩn phim." });
         }
     }
 
@@ -67,36 +98,72 @@ class AdminController {
 
     async addSuatChieu(req, res) {
         try {
-            const { maPhim, maRap, maPhong, ngay, gio, gia } = req.body;
-            await suatChieuModel.create({ maPhim, maRap, maPhong, ngay, gio, gia });
-            res.redirect('/admin/suat-chieu');
+            const result = await suatChieuModel.create(req.body);
+            res.json({ success: true, message: "Thêm suất chiếu thành công!" });
         } catch (error) {
-            console.error("Lỗi thêm suất chiếu:", error.message);
-            res.status(500).send("Lỗi thêm suất chiếu: " + error.message);
+            // Gửi thông báo lỗi cụ thể (ví dụ: "Ca này đã có phim...") về Frontend
+            res.status(400).json({ success: false, message: error.message });
         }
     }
-
-    // Thêm vào AdminController
-    async getPhongsByRap(req, res) {
+    // Hàm xóa suất chiếu
+    async deleteSuatChieu(req, res) {
         try {
-            const maRap = req.params.maRap;
-            // Gọi hàm từ phongModel để lấy phòng của rạp cụ thể
-            const phongs = await phongModel.getByRap(maRap);
-            res.json({ success: true, data: phongs });
+            const { id } = req.params;
+            await suatChieuModel.delete(id); // Gọi hàm delete trong model đã set TRANG_THAI = 0
+            res.json({ success: true });
         } catch (error) {
-            res.status(500).json({ success: false, message: "Lỗi server" });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 
+    // Quản lý Rạp
+    async listRap(req, res) {
+        try {
+            const raps = await rapModel.getAll();
+            res.render('admin/rap', {
+                raps: raps,
+                title: 'Quản lý Rạp Chiếu'
+            });
+        } catch (error) {
+            console.error("Lỗi renderQuanLyRap:", error.message);
+            res.status(500).send("Lỗi hệ thống khi tải danh sách rạp.");
+        }
+    }
+
+    // 2. Thêm rạp mới
+    async addRap(req, res) {
+        try {
+            const { tenRap, diaChi, sdt } = req.body;
+
+            if (!tenRap || !diaChi || !sdt) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Vui lòng nhập đầy đủ thông tin rạp!"
+                });
+            }
+
+            await rapModel.create({ tenRap, diaChi, sdt });
+            res.json({ success: true, message: "Thêm rạp mới thành công!" });
+        } catch (error) {
+            console.error("Lỗi addRap:", error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
+    // 3. ẨN rạp 
+    async toggleRap(req, res) {
+        try {
+            const { id } = req.params;
+            await rapModel.toggleStatus(id);
+            res.json({ success: true, message: "Đã cập nhật trạng thái rạp." });
+        } catch (error) {
+            console.error("❌ Lỗi toggleRap:", error.message);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
     // ==========================================
-    // 3. QUẢN LÝ PHÒNG & TỰ ĐỘNG TẠO GHẾ
+    // 4. QUẢN LÝ PHÒNG & TỰ ĐỘNG TẠO GHẾ
     // ==========================================
-
-    // Hiển thị giao diện danh sách phòng chiếu
-    // adminController.js
-
-    // adminController.js
-
     async listPhong(req, res) {
         try {
             // Chạy song song 2 query:
@@ -116,7 +183,23 @@ class AdminController {
             res.status(500).send("Lỗi server.");
         }
     }
+    async getPhongsByRap(req, res) {
+        try {
+            const { maRap } = req.params;
 
+            // Gọi hàm getByRap từ phongModel (không viết SQL ở đây)
+            const phongs = await phongModel.getByRap(maRap);
+
+            // Trả về dữ liệu chuẩn JSON cho Frontend
+            res.json({
+                success: true,
+                data: phongs
+            });
+        } catch (error) {
+            console.error("Lỗi getPhongsByRap trong Controller:", error.message);
+            res.status(500).json({ success: false, message: "Lỗi hệ thống" });
+        }
+    }
     async addPhongVaGhe(req, res) {
         try {
             const { tenPhong, soHang, soCot, maRap } = req.body;
@@ -162,7 +245,7 @@ class AdminController {
         }
     }
     // ==========================================
-    // 4. QUẢN LÝ THỐNG KÊ (DASHBOARD)
+    // 5. QUẢN LÝ THỐNG KÊ (DASHBOARD)
     // ==========================================
     async getDashboard(req, res) {
         try {
@@ -192,7 +275,7 @@ class AdminController {
     }
 
     // ==========================================
-    // 6. QUẢN LÝ HÓA ĐƠN
+    // 7. QUẢN LÝ HÓA ĐƠN
     // ==========================================
     async listHoaDon(req, res) {
         try {
@@ -205,7 +288,7 @@ class AdminController {
     }
 
     // ==========================================
-    // 7. TOOL TỰ ĐỘNG THÊM PHIM TỪ TMDB
+    // 8. TOOL TỰ ĐỘNG THÊM PHIM TỪ TMDB
     // ==========================================
     async autoImportPhim(req, res) {
         try {

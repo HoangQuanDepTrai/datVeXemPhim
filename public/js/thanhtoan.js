@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrderDetails();
 });
 
-// 1. TỰ ĐỘNG LẤY THÔNG TIN TỪ TÀI KHOẢN (Đã tối ưu)
 function loadUserInfo() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) {
@@ -27,9 +26,6 @@ function loadUserInfo() {
     }
 }
 
-// 2. TÍNH TIỀN VÀ HIỂN THỊ ĐƠN HÀNG (Sửa lỗi dính chữ và nhân số lượng)
-/* public/js/thanhtoan.js */
-
 async function loadOrderDetails() {
     const body = document.getElementById('billing-body');
     if (!body) return;
@@ -46,52 +42,65 @@ async function loadOrderDetails() {
         let htmlRows = "";
         finalTotalAmount = 0;
 
-        // 1. XỬ LÝ GHẾ
+        // 1. NHÓM GHẾ NGỒI (Căn giữa tiêu đề)
         if (resGhe.success && resGhe.data) {
             const selectedGhes = resGhe.data.filter(g => selectedGheIds.includes(String(g.MA_GHE_NGOI)));
-
-            selectedGhes.forEach(g => {
-                const phuPhi = Number(g.PHU_PHI_GHE) || 0;
-                const price = basePrice + phuPhi;
-                finalTotalAmount += price;
-
-                htmlRows += `<tr>
-                    <td>Ghế ${g.TEN_GHE_NGOI} ${phuPhi > 0 ? '<span class="badge bg-danger ms-1">VIP</span>' : ''}</td>
-                    <td class="text-center">1</td>
-                    <td class="text-end">${price.toLocaleString('vi-VN')} đ</td>
-                </tr>`;
-            });
+            if (selectedGhes.length > 0) {
+                htmlRows += `
+                    <tr class="group-header text-center">
+                        <td colspan="3" class="py-2 fw-bold text-uppercase small" style="letter-spacing: 1px;">
+                            <i class="fas fa-couch me-2"></i>Ghế ngồi
+                        </td>
+                    </tr>`;
+                selectedGhes.forEach(g => {
+                    const phuPhi = Number(g.PHU_PHI_GHE) || 0;
+                    const price = basePrice + phuPhi;
+                    finalTotalAmount += price;
+                    htmlRows += `<tr>
+                        <td class="ps-4">Ghế ${g.TEN_GHE_NGOI} ${phuPhi > 0 ? '<span class="badge bg-danger ms-1">VIP</span>' : ''}</td>
+                        <td class="text-center">1</td>
+                        <td class="text-end fw-bold">${price.toLocaleString('vi-VN')} đ</td>
+                    </tr>`;
+                });
+            }
         }
 
-        // 2. XỬ LÝ COMBO (FIX LỖI HIỂN THỊ "SỐ 3")
+        // 2. NHÓM BẮP NƯỚC (Căn giữa tiêu đề)
         if (combosStr && resSp.success && resSp.data) {
             const items = combosStr.split('|');
+            let hasComboHead = false;
+
             items.forEach(item => {
                 const parts = item.split(':');
                 const id = parts[0];
                 const qty = Number(parts[1]) || 0;
-
                 const product = resSp.data.find(x => String(x.MA_SAN_PHAM) === String(id));
 
                 if (product && qty > 0) {
+                    if (!hasComboHead) {
+                        htmlRows += `
+                            <tr class="group-header text-center">
+                                <td colspan="3" class="py-2 fw-bold text-uppercase small" style="letter-spacing: 1px;">
+                                    <i class="fas fa-popcorn me-2"></i>Bắp nước & Combo
+                                </td>
+                            </tr>`;
+                        hasComboHead = true;
+                    }
                     const unitPrice = Number(product.GIA_SAN_PHAM) || 0;
-                    const subTotal = unitPrice * qty; // Tính toán thuần số học
-
+                    const subTotal = unitPrice * qty;
                     finalTotalAmount += subTotal;
 
-                    // Template literal sạch sẽ, không có ký tự thừa
                     htmlRows += `<tr>
-                        <td>${product.TEN_SAN_PHAM}</td>
+                        <td class="ps-4">${product.TEN_SAN_PHAM}</td>
                         <td class="text-center">${qty}</td>
-                        <td class="text-end">${subTotal.toLocaleString('vi-VN')} đ</td>
+                        <td class="text-end fw-bold">${subTotal.toLocaleString('vi-VN')} đ</td>
                     </tr>`;
                 }
             });
         }
 
-        // 3. ĐỔ DỮ LIỆU VÀ CẬP NHẬT TỔNG TIỀN
-        body.innerHTML = htmlRows || '<tr><td colspan="3" class="text-center text-muted">Đơn hàng trống</td></tr>';
-        // Đảm bảo cập nhật đúng ID final-total trong EJS của em
+        body.innerHTML = htmlRows || '<tr><td colspan="3" class="text-center py-5 text-muted border-0">Đơn hàng trống</td></tr>';
+        
         const finalTotalEl = document.getElementById('final-total');
         if (finalTotalEl) {
             finalTotalEl.innerText = finalTotalAmount.toLocaleString('vi-VN') + " VNĐ";
@@ -99,18 +108,17 @@ async function loadOrderDetails() {
 
     } catch (err) {
         console.error("Lỗi:", err);
-        body.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi tải dữ liệu.</td></tr>';
+        body.innerHTML = '<tr><td colspan="3" class="text-center text-danger py-4">Lỗi tải dữ liệu đơn hàng.</td></tr>';
     }
 }
 
-// 3. XỬ LÝ THANH TOÁN
 async function submitOrder() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return alert("Vui lòng đăng nhập!");
-
-    const btn = document.querySelector('button[onclick="submitOrder()"]');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang tạo giao dịch...';
+    const btn = document.getElementById('btnPayment'); 
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang xử lý...';
+    }
 
     try {
         const res = await fetch('/api/ve/dat-ve', {
@@ -120,7 +128,7 @@ async function submitOrder() {
                 maNguoiDung: user.MA_NGUOI_DUNG,
                 maSuatChieu: parseInt(maSC),
                 danhSachMaGhe: ghesStr.split(',').map(Number),
-                tongTien: finalTotalAmount // Tổng tiền cuối cùng đã bao gồm ghế + bắp nước
+                tongTien: finalTotalAmount
             })
         });
 
@@ -128,12 +136,13 @@ async function submitOrder() {
         if (result.success && result.paymentUrl) {
             window.location.href = result.paymentUrl;
         } else {
-            throw new Error(result.message || "Không thể tạo link thanh toán");
+            throw new Error(result.message || "Lỗi tạo giao dịch");
         }
     } catch (error) {
-        console.error("Lỗi submit:", error);
-        alert("Lỗi: " + error.message);
-        btn.disabled = false;
-        btn.innerHTML = 'XÁC NHẬN & THANH TOÁN';
+        alert(error.message);
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'XÁC NHẬN THANH TOÁN';
+        }
     }
 }

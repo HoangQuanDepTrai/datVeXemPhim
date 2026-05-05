@@ -14,9 +14,4 @@ router.post('/dat-ve', veController.datVe);
 // 3. Xử lý khi VNPay quay về
 router.get('/vnpay-return', veController.vnpayReturn);
 
-// Trong veRouter.js
-router.get('/thanhtoan', (req, res) => {
-    res.render('thanhtoan');
-});
-
 module.exports = router;

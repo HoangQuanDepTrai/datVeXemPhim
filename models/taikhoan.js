@@ -13,6 +13,18 @@ class TaiKhoanModel {
             `);
         return result.recordset[0];
     }
+    async findById(id) {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('id', sql.Int, id) // Truyền MA_NGUOI_DUNG vào đây
+            .query(`
+            SELECT n.*, v.TEN_VAI_TRO 
+            FROM NGUOI_DUNG n
+            JOIN VAI_TRO v ON n.MA_VAI_TRO = v.MA_VAI_TRO
+            WHERE n.MA_NGUOI_DUNG = @id
+        `);
+        return result.recordset[0]; // Trả về thông tin người dùng duy nhất
+    }
     async create(data) {
         const pool = await poolPromise;
         return await pool.request()

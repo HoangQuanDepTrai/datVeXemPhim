@@ -86,8 +86,6 @@ async function loadSeatMap() {
 
                 if (seat.DA_DAT == 1) {
                     seatDiv.classList.add('occupied');
-                    // XÓA HOẶC COMMENT DÒNG DƯỚI ĐÂY:
-                    // seatDiv.innerText = '';  <-- Chặn dòng này lại để tên ghế không bị xóa
                 } else {
                     seatDiv.classList.add('available');
                     seatDiv.onclick = () => toggleSeat(seatDiv, seat);
@@ -123,20 +121,45 @@ function toggleSeat(element, seat) {
 
 // 4. Cập nhật Sidebar Thông tin đơn hàng
 function updateUI() {
+    const seatListContainer = document.getElementById('selected-seats-text');
+    const totalPriceElement = document.getElementById('total-price');
+
     if (selectedSeats.length > 0) {
-        const seatNames = selectedSeats.map(s => s.TEN_GHE_NGOI).join(', ');
-        document.getElementById('selected-seats-text').innerText = seatNames;
+        // 1. Tạo danh sách chi tiết từng ghế
+        let listHtml = '<div class="selected-seats-list mt-2">';
+
+        selectedSeats.forEach(seat => {
+            const phuPhi = parseFloat(seat.PHU_PHI_GHE) || 0;
+            const itemPrice = basePrice + phuPhi;
+
+            listHtml += `
+                <div class="d-flex justify-content-between align-items-center mb-2" style="font-size: 0.9rem;">
+                    <span>
+                        <i class="fas fa-chair me-2 ${phuPhi > 0 ? 'text-warning' : 'text-secondary'}"></i>
+                        Ghế <b class="text-white">${seat.TEN_GHE_NGOI}</b> 
+                        ${phuPhi > 0 ? '<span class="badge bg-danger ms-1" style="font-size: 0.7rem;">VIP</span>' : ''}
+                    </span>
+                    <span class="text-warning">${itemPrice.toLocaleString('vi-VN')} đ</span>
+                </div>
+            `;
+        });
+
+        listHtml += '</div>';
+
+        // Thay vì chỉ gán text, chúng ta gán innerHTML để hiển thị danh sách
+        seatListContainer.innerHTML = listHtml;
+
     } else {
-        document.getElementById('selected-seats-text').innerText = 'Chưa chọn';
+        seatListContainer.innerText = 'Chưa chọn';
     }
 
-    // Tính tổng tiền = Giá vé cơ bản + Phụ phí ghế VIP
+    // 2. Tính tổng tiền
     const totalTicketPrice = selectedSeats.reduce((sum, seat) => {
         const phuPhi = parseFloat(seat.PHU_PHI_GHE) || 0;
         return sum + basePrice + phuPhi;
     }, 0);
 
-    document.getElementById('total-price').innerText = totalTicketPrice.toLocaleString('vi-VN') + ' VNĐ';
+    totalPriceElement.innerText = totalTicketPrice.toLocaleString('vi-VN') + ' VNĐ';
 }
 // =========================================================
 // PHẦN CHỌN BẮP NƯỚC VÀ XÁC NHẬN (Copy từ logic cũ của bạn)

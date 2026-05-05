@@ -13,139 +13,183 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        .select2-container--bootstrap-5 .select2-selection {
-            min-height: 38px;
+        /* 1. CSS Cho Modal hiện đại (image_58431f.png) */
+        .rounded-4 {
+            border-radius: 1rem !important;
+        }
+
+        .modal-header-pink {
+            background-color: #d82f8b;
+        }
+
+        .btn-pink {
+            background-color: #d82f8b;
+            color: white;
+            border: none;
+        }
+
+        .btn-pink:hover {
+            background-color: #b52372;
+            color: white;
+        }
+
+        /* 2. Sửa lỗi poster bị lệch đè lên khung (image_585242.png) */
+        .select2-container--bootstrap-5 .select2-selection--single {
+            display: flex !important;
+            align-items: center !important;
+            height: 42px !important;
+        }
+
+        .select2-container--bootstrap-5 .select2-selection__rendered {
+            display: flex !important;
+            align-items: center !important;
+            padding-left: 8px !important;
         }
 
         .img-poster-select {
-            width: 30px;
-            height: 40px;
+            width: 28px;
+            height: 38px;
             object-fit: cover;
-            margin-right: 10px;
-            border-radius: 2px;
+            margin-right: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            border: 1px solid #ddd;
         }
 
         .select2-results__option {
-            display: flex;
-            align-items: center;
+            display: flex !important;
+            align-items: center !important;
+            padding: 8px 12px !important;
         }
 
         .dataTables_wrapper {
             padding: 15px;
         }
 
-        .card-header {
-            font-size: 1.1rem;
+        .main-card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 1rem;
+        }
+
+        /* Làm đẹp nhãn Tên Phòng */
+        .badge-room {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #dee2e6;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Định dạng Ngày chiếu */
+        .date-text {
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Làm nổi bật Giờ chiếu và Giá vé */
+        .time-highlight {
+            color: #0d6efd;
+            /* Màu xanh đậm chuyên nghiệp */
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .price-highlight {
+            color: #d82f8b;
+            /* Màu hồng đậm tông xuyệt tông với admin */
+            font-weight: 700;
+        }
+
+        /* Căn chỉnh bảng cho thoáng */
+        #tableSuatChieu td {
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+
+        #gioChieu {
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+        #gioChieu:focus {
+            border-color: #d82f8b;
+            box-shadow: 0 0 0 0.25rem rgba(216, 47, 139, 0.1);
+        }
+
+        #gioChieu option {
+            padding: 10px;
+            font-weight: 500;
         }
     </style>
 </head>
 
 <body class="bg-light">
     <%- include('../partials/admin_sidebar') %>
+
         <div class="container mt-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold text-dark">Quản lý Suất Chiếu</h2>
-                <a href="/admin" class="btn btn-secondary"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <!-- Nút bật Modal mới -->
+                <button class="btn btn-pink rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#modalAddSuatChieu">
+                    <i class="bi bi-plus-circle me-1"></i> Tạo Suất Chiếu Mới
+                </button>
             </div>
 
-            <div class="card mb-4 shadow-sm border-0">
-                <div class="card-header bg-primary text-white fw-bold">
-                    <i class="bi bi-plus-circle"></i> Thêm Suất Chiếu Mới
+            <div class="card main-card mb-5">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0 text-dark">Danh sách các suất chiếu</h5>
                 </div>
-                <div class="card-body">
-                    <form id="formThemSuatChieu">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">1. Chọn Rạp</label>
-                                <select id="maRap" class="form-select select2-basic" required>
-                                    <option value="">-- Tìm rạp --</option>
-                                    <% if (typeof raps !=='undefined' ) { %>
-                                        <% raps.forEach(rap=> { %>
-                                            <option value="<%= rap.MA_RAP %>">
-                                                <%= rap.TEN_RAP %>
-                                            </option>
-                                            <% }) %>
-                                                <% } %>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">2. Chọn Phòng Chiếu</label>
-                                <select id="maPhong" class="form-select select2-basic" required disabled>
-                                    <option value="">-- Vui lòng chọn rạp trước --</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">3. Chọn Phim</label>
-                                <select id="maPhim" class="form-select select2-movie" required>
-                                    <option value="">-- Tìm phim --</option>
-                                    <% if (typeof phims !=='undefined' ) { %>
-                                        <% phims.forEach(phim=> { %>
-                                            <option value="<%= phim.MA_PHIM %>" data-img="<%= phim.HINH_ANH_POSTER %>">
-                                                <%= phim.TEN_PHIM %>
-                                            </option>
-                                            <% }) %>
-                                                <% } %>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Thời gian chiếu</label>
-                                <input type="datetime-local" id="thoiGian" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Giá vé cơ bản (VNĐ)</label>
-                                <input type="number" id="giaVe" class="form-control" value="75000" required>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-success px-5 fw-bold">
-                            <i class="bi bi-save"></i> Lưu Suất Chiếu
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-5 border-0">
-                <div class="card-header bg-dark text-white fw-bold">Danh sách các suất chiếu</div>
                 <div class="card-body p-0">
-                    <table id="tableSuatChieu" class="table table-bordered table-hover mb-0 w-100">
-                        <thead class="table-light text-center">
+                    <table id="tableSuatChieu" class="table table-hover align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th style="width: 50px;">STT</th>
-                                <th>Tên Phim</th>
+                                <th>Phim</th>
                                 <th>Rạp chiếu</th>
                                 <th>Phòng</th>
-                                <th>Ngày chiếu</th>
-                                <th>Giờ chiếu</th>
-                                <th>Giá vé</th>
+                                <th class="text-center">Ngày chiếu</th>
+                                <th class="text-center">Giờ chiếu</th>
+                                <th class="text-end">Giá vé</th>
+                                <th class="text-center">Thao tác</th> <!-- Thêm cột này -->
                             </tr>
                         </thead>
                         <tbody>
                             <% if (typeof suatChieus !=='undefined' && suatChieus.length> 0) { %>
                                 <% suatChieus.forEach(sc=> { %>
                                     <tr>
-                                        <td class="text-center fw-bold"></td>
-                                        <td class="fw-bold">
+                                        <td class="text-center fw-bold text-muted"></td>
+                                        <td class="fw-bold text-dark">
                                             <%= sc.TEN_PHIM %>
                                         </td>
-                                        <td class="text-primary"><i class="bi bi-geo-alt"></i>
-                                            <%= sc.TEN_RAP %>
-                                        </td>
+                                        <td><span class="text-primary"><i class="bi bi-geo-alt-fill me-1"></i>
+                                                <%= sc.TEN_RAP %>
+                                            </span></td>
+                                        <td class="text-center"><span class="badge-room">
+                                                <%= sc.TEN_PHONG %>
+                                            </span></td>
+                                        <td class="text-center"><span class="date-text">
+                                                <%= new Date(sc.NGAY_CHIEU).toLocaleDateString('vi-VN') %>
+                                            </span></td>
+                                        <td class="text-center"><span class="time-highlight">
+                                                <%= sc.GIO_BAT_DAU %>
+                                            </span></td>
+                                        <td class="text-end"><span class="price-highlight">
+                                                <%= sc.GIA_VE_CO_BAN.toLocaleString('vi-VN') %> đ
+                                            </span></td>
                                         <td class="text-center">
-                                            <%= sc.TEN_PHONG %>
-                                        </td>
-                                        <td class="text-center">
-                                            <%= new Date(sc.NGAY_CHIEU).toLocaleDateString('vi-VN') %>
-                                        </td>
-                                        <td class="text-center text-primary fw-bold">
-                                            <%= sc.GIO_BAT_DAU %>
-                                        </td>
-                                        <td class="text-end text-danger fw-bold">
-                                            <%= sc.GIA_VE_CO_BAN.toLocaleString('vi-VN') %> đ
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <!-- Nút Xóa -->
+                                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                    onclick="deleteSuatChieu('<%= sc.MA_SUAT_CHIEU %>')">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                     <% }) %>
@@ -156,23 +200,116 @@
             </div>
         </div>
 
+        <!-- MODAL THÊM MỚI (THEO MẪU DUY THÍCH) -->
+        <div class="modal fade" id="modalAddSuatChieu" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header modal-header-pink text-white border-0 py-3">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-calendar-plus me-2"></i>Tạo Suất Chiếu Mới</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="formThemSuatChieu">
+                        <div class="modal-body p-4">
+                            <!-- 1. Chọn Phim -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark">1. Chọn Phim <span
+                                        class="text-danger">*</span></label>
+                                <select id="maPhim" class="form-select select2-movie" required>
+                                    <option value="">-- Chọn Phim --</option>
+                                    <% if (typeof phims !=='undefined' ) { %>
+                                        <% phims.forEach(phim=> { %>
+                                            <option value="<%= phim.MA_PHIM %>" data-img="<%= phim.HINH_ANH_POSTER %>">
+                                                <%= phim.TEN_PHIM %>
+                                            </option>
+                                            <% }) %>
+                                                <% } %>
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <!-- 2. Chọn Rạp -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark">2. Chọn Rạp <span
+                                            class="text-danger">*</span></label>
+                                    <select id="maRap" class="form-select select2-basic" required>
+                                        <option value="">-- Chọn rạp --</option>
+                                        <% if (typeof raps !=='undefined' ) { %>
+                                            <% raps.forEach(rap=> { %>
+                                                <option value="<%= rap.MA_RAP %>">
+                                                    <%= rap.TEN_RAP %>
+                                                </option>
+                                                <% }) %>
+                                                    <% } %>
+                                    </select>
+                                </div>
+                                <!-- 3. Chọn Phòng Chiếu -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark">3. Chọn Phòng Chiếu <span
+                                            class="text-danger">*</span></label>
+                                    <select id="maPhong" class="form-select select2-basic" required disabled>
+                                        <option value="">-- Vui lòng chọn rạp trước --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- 4. Ngày Chiếu -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark">4. Ngày Chiếu <span
+                                            class="text-danger">*</span></label>
+                                    <input type="date" id="ngayChieu" class="form-control" required>
+                                </div>
+                                <!-- 5. Chọn Ca Chiếu -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark">5. Chọn Ca Chiếu <span
+                                            class="text-danger">*</span></label>
+                                    <select id="gioChieu" class="form-select rounded-3 shadow-sm" required>
+                                        <option value="" selected disabled>-- Chọn ca chiếu --</option>
+                                        <option value="08:00">Ca 1 (08:00 - 11:00)</option>
+                                        <option value="11:00">Ca 2 (11:00 - 14:00)</option>
+                                        <option value="14:00">Ca 3 (14:00 - 17:00)</option>
+                                        <option value="17:00">Ca 4 (17:00 - 20:00)</option>
+                                        <option value="20:00">Ca 5 (20:00 - 23:00)</option>
+                                        <option value="23:00">Ca 6 (23:00 - 02:00)</option>
+                                    </select>
+                                    <div class="form-text text-muted small">Mỗi ca cách nhau 3 tiếng.</div>
+                                </div>
+                                <!-- 6. Giá Vé -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark">6. Giá Vé Cơ Bản (VNĐ) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" id="giaVe" class="form-control" value="75000" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pb-4 pe-4">
+                            <button type="button" class="btn btn-light px-4 fw-bold text-muted"
+                                data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-pink px-4 fw-bold shadow-sm">
+                                Tạo Suất Chiếu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
             $(document).ready(function () {
-                // 1. Khởi tạo DataTable với STT tự động
-                // Khởi tạo DataTable với STT tự động
+                // 1. Khởi tạo DataTable
                 const t = $('#tableSuatChieu').DataTable({
                     "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json" },
                     "columnDefs": [{ "searchable": false, "orderable": false, "targets": 0 }],
-                    "order": [[4, 'desc'], [5, 'desc']] // Ưu tiên ngày giờ mới nhất
+                    "order": [[4, 'desc']]
                 });
 
-                // Logic đánh số thứ tự STT
                 t.on('order.dt search.dt', function () {
                     let i = 1;
                     t.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
@@ -180,67 +317,80 @@
                     });
                 }).draw();
 
-                // 2. Khởi tạo Select2 cho Rạp và Phòng
-                $('.select2-basic').select2({ theme: 'bootstrap-5' });
+                // 2. Khởi tạo Select2
+                $('.select2-basic').select2({ theme: 'bootstrap-5', dropdownParent: $('#modalAddSuatChieu') });
 
-                // Khởi tạo Select2 cho Phim có hình ảnh
                 function formatMovie(movie) {
                     if (!movie.id) return movie.text;
                     var img = $(movie.element).data('img');
-                    return $(`<span><img src="${img}" class="img-poster-select" /> ${movie.text}</span>`);
+                    return $(`<div class="d-flex align-items-center"><img src="${img}" class="img-poster-select" /> <span>${movie.text}</span></div>`);
                 };
 
                 $('.select2-movie').select2({
                     theme: 'bootstrap-5',
+                    dropdownParent: $('#modalAddSuatChieu'),
                     templateResult: formatMovie,
                     templateSelection: formatMovie
                 });
 
-                // 3. Logic lọc phòng theo rạp thông qua API
+                // 3. Logic lọc phòng theo rạp (Đã sửa đường dẫn API)
                 $('#maRap').on('change', async function () {
                     const maRap = $(this).val();
                     const $maPhong = $('#maPhong');
 
+                    // Reset và vô hiệu hóa ô chọn phòng khi đang tải
                     $maPhong.empty().append('<option value="">-- Đang tải phòng... --</option>').trigger('change');
                     $maPhong.prop('disabled', true);
 
-                    if (!maRap) return;
+                    if (!maRap) {
+                        $maPhong.html('<option value="">-- Vui lòng chọn rạp trước --</option>');
+                        return;
+                    }
 
                     try {
+                        // Duy kiểm tra route này ở Backend nhé, nó phải khớp với app.use('/admin', ...)
                         const response = await fetch(`/admin/api/phongs-by-rap/${maRap}`);
                         const result = await response.json();
 
                         if (result.success && result.data.length > 0) {
                             let html = '<option value="">-- Chọn phòng --</option>';
                             result.data.forEach(p => {
-                                html += `<option value="${p.MA_PHONG_CHIEU}">${p.TEN_PHONG_CHIEU}</option>`;
+                                // Duy check xem Backend trả về MA_PHONG_CHIEU hay MA_PHONG nhé
+                                html += `<option value="${p.MA_PHONG_CHIEU || p.MA_PHONG}">${p.TEN_PHONG_CHIEU || p.TEN_PHONG}</option>`;
                             });
                             $maPhong.html(html).prop('disabled', false).trigger('change');
                         } else {
                             $maPhong.html('<option value="">Rạp này chưa có phòng</option>').trigger('change');
                         }
                     } catch (err) {
-                        alert("Lỗi tải danh sách phòng từ máy chủ!");
+                        console.error("Lỗi fetch phòng:", err);
+                        $maPhong.html('<option value="">Lỗi tải dữ liệu</option>').trigger('change');
                     }
                 });
 
-                // 4. Xử lý Form Lưu Suất Chiếu qua Fetch API
+                // 4. Xử lý lưu form qua AJAX (Đã sửa đường dẫn khớp với app.use('/admin', adminRouter))
                 $('#formThemSuatChieu').on('submit', async function (e) {
                     e.preventDefault();
-                    const thoiGian = $('#thoiGian').val();
-                    if (!thoiGian) return;
 
-                    const [ngay, gio] = thoiGian.split('T');
                     const data = {
                         maPhim: $('#maPhim').val(),
                         maRap: $('#maRap').val(),
                         maPhong: $('#maPhong').val(),
-                        ngay: ngay,
-                        gio: gio,
+                        ngay: $('#ngayChieu').val(), // Đảm bảo ID này khớp với input date trong Modal
+                        gio: $('#gioChieu').val(),   // Đảm bảo ID này khớp với select ca chiếu
                         gia: $('#giaVe').val()
                     };
 
+                    // Thông báo chờ xịn sò
+                    Swal.fire({
+                        title: 'Đang kiểm tra lịch...',
+                        text: 'Vui lòng chờ trong giây lát',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
                     try {
+                        // ĐƯỜNG DẪN QUAN TRỌNG: Phải khớp với app.use('/admin', adminRouter) trong index.js
                         const response = await fetch('/admin/suat-chieu/add', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -248,18 +398,50 @@
                         });
 
                         const result = await response.json();
+
                         if (result.success) {
-                            alert('Thêm suất chiếu thành công!');
-                            window.location.reload();
+                            Swal.fire('Thành công!', 'Suất chiếu đã được tạo trên hệ thống.', 'success')
+                                .then(() => location.reload());
                         } else {
-                            alert('Lỗi: ' + result.message);
+                            // Hiển thị lỗi ràng buộc (Trùng ca, cấn giờ) từ Model trả về
+                            Swal.fire('Không thể tạo!', result.message, 'warning');
                         }
                     } catch (err) {
-                        console.error("Lỗi gửi dữ liệu:", err);
-                        window.location.reload();
+                        console.error("Lỗi gửi form:", err);
+                        Swal.fire('Lỗi kết nối!', 'Không thể gửi dữ liệu đến Server. Duy kiểm tra lại Terminal nhé!', 'error');
                     }
                 });
             });
+            async function deleteSuatChieu(id) {
+                const result = await Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Suất chiếu này sẽ không còn hiển thị trên hệ thống!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d82f8b', // Màu hồng tông Duy Movie
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý xóa',
+                    cancelButtonText: 'Hủy'
+                });
+
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Đang xử lý...', didOpen: () => Swal.showLoading() });
+
+                    try {
+                        const response = await fetch(`/admin/suat-chieu/delete/${id}`, { method: 'GET' });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            Swal.fire('Đã xóa!', 'Suất chiếu đã được gỡ bỏ.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi!', data.message, 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Lỗi kết nối!', 'Không thể thực hiện yêu cầu.', 'error');
+                    }
+                }
+            }
         </script>
 </body>
 

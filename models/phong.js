@@ -24,7 +24,7 @@ class PhongModel {
             const result = await pool.request().query(querySql);
             return result.recordset;
         } catch (err) {
-            console.error("❌ Lỗi SQL trong getAll Phong:", err.message);
+            console.error("Lỗi SQL trong getAll Phong:", err.message);
             return [];
         }
     }
@@ -42,7 +42,7 @@ class PhongModel {
             console.log(`==> Kết quả SQL: Tìm thấy ${result.recordset.length} phòng.`); // LOG 2
             return result.recordset;
         } catch (err) {
-            console.error("❌ Lỗi SQL getByRap:", err.message);
+            console.error("Lỗi SQL getByRap:", err.message);
             return [];
         }
     }
@@ -63,7 +63,7 @@ class PhongModel {
             console.log("=> Đã tạo phòng mới, ID:", result.recordset[0].MA_PHONG_CHIEU);
             return result;
         } catch (err) {
-            console.error("❌ Lỗi SQL trong create Phong:", err.message);
+            console.error("Lỗi SQL trong create Phong:", err.message);
             throw err;
         }
     }

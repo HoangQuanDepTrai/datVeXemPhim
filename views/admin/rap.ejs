@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <%- include('../partials/head') %>
+        <link rel="stylesheet" href="/css/admin_dashboard.css">
+        <title>Quản lý Rạp Chiếu - NoliCinema</title>
+</head>
+
+<body class="bg-light">
+    <%- include('../partials/admin_sidebar') %>
+
+        <div class="main-content">
+            <div class="top-nav mb-4">
+                <h4 class="fw-bold mb-0">Hệ thống / <small class="text-muted">Quản lý Rạp</small></h4>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 rounded-4 mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0 text-primary"><i class="bi bi-building"></i> Danh Sách Rạp Phim</h4>
+                    <button class="btn btn-danger rounded-pill px-4" data-bs-toggle="modal"
+                        data-bs-target="#modalAddRap">
+                        <i class="bi bi-plus-lg"></i> Thêm Rạp Mới
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 80px;">STT</th>
+                                <th>Tên Rạp</th>
+                                <th>Địa Chỉ</th>
+                                <th>Số Điện Thoại</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (typeof raps !=='undefined' && raps.length> 0) { %>
+                                <% raps.forEach((rap, index)=> {
+                                    // Kiểm tra trạng thái rạp (0 hoặc false là đang ẩn)
+                                    const isHidden = (rap.TRANG_THAI == 0 || rap.TRANG_THAI === false);
+                                    %>
+                                    <!-- Thêm class làm mờ nếu rạp bị ẩn -->
+                                    <tr class="<%= isHidden ? 'opacity-50 bg-light' : '' %>">
+                                        <td class="fw-bold text-secondary text-center">
+                                            <%= index + 1 %>
+                                        </td>
+                                        <td class="fw-bold <%= isHidden ? 'text-muted' : 'text-dark' %>">
+                                            <%= rap.TEN_RAP %>
+                                        </td>
+                                        <td class="<%= isHidden ? 'text-muted' : '' %>">
+                                            <%= rap.DIA_CHI %>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge <%= isHidden ? 'bg-secondary' : 'bg-light text-dark' %> border px-3 py-2">
+                                                <%= rap.SO_DIEN_THOAI %>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <!-- Nút Sửa: Thêm disabled nếu rạp bị ẩn -->
+                                                <button class="btn btn-sm btn-outline-primary rounded-circle"
+                                                    onclick="editRap('<%= rap.MA_RAP %>')" title="Sửa" <%=isHidden
+                                                    ? 'disabled' : '' %>>
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+
+                                                <!-- Nút Ẩn / Khôi phục -->
+                                                <% if (isHidden) { %>
+                                                    <button class="btn btn-sm btn-outline-success rounded-circle"
+                                                        onclick="toggleRap('<%= rap.MA_RAP %>', 'khôi phục')"
+                                                        title="Khôi phục rạp">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <% } else { %>
+                                                        <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                                                            onclick="toggleRap('<%= rap.MA_RAP %>', 'ẩn')"
+                                                            title="Ẩn rạp">
+                                                            <i class="bi bi-eye-slash"></i>
+                                                        </button>
+                                                        <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-5">Chưa có dữ liệu rạp
+                                                    chiếu</td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Thêm Rạp -->
+        <div class="modal fade" id="modalAddRap" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold">Thêm Rạp Mới</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="formAddRap">
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Rạp</label>
+                                <input type="text" id="tenRap" class="form-control"
+                                    placeholder="VD: Duy Movie Long Xuyên" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Địa Chỉ</label>
+                                <textarea id="diaChi" class="form-control" rows="2" placeholder="Nhập địa chỉ chi tiết"
+                                    required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số Điện Thoại</label>
+                                <input type="text" id="sdt" class="form-control" placeholder="VD: 02963123456" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" id="email" class="form-control" placeholder="VD: rap@example.com"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary px-4">Lưu Rạp</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            // Xử lý thêm rạp qua AJAX
+            $('#formAddRap').submit(async function (e) {
+                e.preventDefault();
+                const data = {
+                    tenRap: $('#tenRap').val(),
+                    diaChi: $('#diaChi').val(),
+                    sdt: $('#sdt').val(),
+                    email: $('#email').val()
+                };
+
+                try {
+                    const res = await fetch('/admin/rap/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        Swal.fire('Thành công!', 'Rạp mới đã được thêm.', 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi!', result.message, 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Lỗi!', 'Không thể kết nối máy chủ', 'error');
+                }
+            });
+
+            // Hàm Xóa rạp
+            async function toggleRap(id, action) {
+                const isHide = action === 'ẩn';
+
+                const confirm = await Swal.fire({
+                    title: `Xác nhận ${action} rạp?`,
+                    text: isHide ? "Rạp này sẽ bị làm mờ và vô hiệu hóa tạm thời!" : "Rạp sẽ hoạt động trở lại bình thường!",
+                    icon: isHide ? 'warning' : 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: isHide ? '#6c757d' : '#198754',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonText: `Đồng ý ${action}`
+                });
+
+                if (confirm.isConfirmed) {
+                    try {
+                        const res = await fetch(`/admin/rap/toggle/${id}`, { method: 'POST' });
+                        const result = await res.json();
+                        if (result.success) {
+                            Swal.fire('Thành công!', '', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi!', result.message, 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Lỗi!', 'Lỗi hệ thống', 'error');
+                    }
+                }
+            }
+
+            function editRap(id) {
+                Swal.fire('Thông báo', 'Tính năng sửa đang được cập nhật!', 'info');
+            }
+        </script>
+</body>
+
+</html>

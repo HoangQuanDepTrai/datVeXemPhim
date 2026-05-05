@@ -3,62 +3,205 @@
 
 <head>
     <%- include('partials/head') %>
-        <title>Thanh Toán - CinéHub</title>
-        <link rel="stylesheet" href="/css/thanhtoan.css">
+        <title>Thanh Toán</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            .form-control:focus {
+                border-color: #dc3545;
+                box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.1);
+            }
+
+            .card {
+                border-radius: 12px;
+                border: none;
+            }
+
+            .table thead th {
+                background-color: #f8f9fa;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+            }
+        </style>
 </head>
 
-<body class="bg-dark text-white">
+<body class="bg-light text-dark">
     <%- include('partials/header') %>
 
-        <div class="container mt-5 pb-5">
-            <h2 class="text-danger fw-bold mb-4 text-center">CHI TIẾT THANH TOÁN</h2>
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-uppercase"><span class="border-bottom border-danger border-3 pb-2">Chi Tiết
+                        Thanh Toán</span></h2>
+            </div>
 
             <div class="row g-4">
-                <div class="col-md-5">
-                    <div class="checkout-box shadow">
-                        <h5 class="text-warning mb-4"><i class="fas fa-user me-2"></i>Thông tin liên hệ</h5>
-                        <div class="mb-3">
-                            <label class="small text-secondary">Họ tên *</label>
-                            <input type="text" id="cus_name" class="form-control" placeholder="Đang tải...">
-                        </div>
-                        <div class="mb-3">
-                            <label class="small text-secondary">Số điện thoại *</label>
-                            <input type="text" id="cus_phone" class="form-control" placeholder="Đang tải...">
-                        </div>
-                        <div class="mb-3">
-                            <label class="small text-secondary">Email</label>
-                            <input type="email" id="cus_email" class="form-control" placeholder="Đang tải...">
+                <div class="col-lg-5">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-danger mb-4 fw-bold">
+                                <i class="fas fa-user-circle me-2"></i>Thông tin liên hệ
+                            </h5>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Họ và tên *</label>
+                                <input type="text" id="cus_name" class="form-control border-2"
+                                    placeholder="Đang tải...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Số điện thoại *</label>
+                                <input type="text" id="cus_phone" class="form-control border-2"
+                                    placeholder="Đang tải...">
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label small fw-bold text-muted">Email</label>
+                                <input type="email" id="cus_email" class="form-control border-2"
+                                    placeholder="Đang tải...">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-7">
-                    <div class="checkout-box shadow">
-                        <h5 class="text-warning mb-4"><i class="fas fa-shopping-cart me-2"></i>Đơn hàng của bạn</h5>
-                        <table class="table table-borderless">
-                            <thead>
-                                <tr class="border-bottom border-secondary text-secondary">
-                                    <th>Sản phẩm / Ghế</th>
-                                    <th class="text-center">SL</th>
-                                    <th class="text-end">Giá</th>
-                                </tr>
-                            </thead>
-                            <tbody id="billing-body">
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Đang tải chi tiết đơn hàng...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-danger mb-4 fw-bold">
+                                <i class="fas fa-shopping-basket me-2"></i>Đơn hàng của bạn
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                        <tr class="text-secondary">
+                                            <th class="border-0 py-3">Sản phẩm / Ghế</th>
+                                            <th class="border-0 py-3 text-center">SL</th>
+                                            <th class="border-0 py-3 text-end">Giá</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="billing-body">
+                                        <tr>
+                                            <td colspan="3" class="text-center py-5 text-muted border-0">
+                                                <div class="spinner-border spinner-border-sm text-danger me-2"></div>
+                                                Đang tải đơn hàng...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                        <div class="border-top border-secondary pt-3 mt-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">TỔNG CỘNG</h4>
-                                <h3 class="text-danger fw-bold mb-0" id="final-total"></h3>
+                            <div class="mt-4 p-4 bg-light rounded-3 border-start border-danger border-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="h5 mb-0 fw-bold">TỔNG CỘNG:</span>
+                                    <span class="h3 mb-0 fw-bolder text-danger" id="final-total">0 VNĐ</span>
+                                </div>
+
+                                <div class="form-check border-top pt-3">
+                                    <input class="form-check-input border-danger" type="checkbox" id="agreeTerms">
+                                    <label class="form-check-label small" for="agreeTerms">
+                                        Tôi đã đọc và đồng ý với <a href="#"
+                                            class="text-danger fw-bold text-decoration-none" data-bs-toggle="modal"
+                                            data-bs-target="#termsModal">điều khoản dịch vụ</a>.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 row g-2">
+                                <div class="col-6">
+                                    <button class="btn btn-outline-dark w-100 py-3 fw-bold rounded-pill"
+                                        onclick="history.back()">QUAY LẠI</button>
+                                </div>
+                                <div class="col-6">
+                                    <button id="btnPayment"
+                                        class="btn btn-danger w-100 py-3 fw-bold shadow rounded-pill"
+                                        onclick="validateAndSubmit()" disabled>
+                                        XÁC NHẬN THANH TOÁN
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <button class="btn btn-danger w-100 mt-4 py-3 fw-bold rounded-pill" onclick="submitOrder()">
-                            XÁC NHẬN & THANH TOÁN
+        <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white border-0">
+                        <h5 class="modal-title fw-bold" id="termsModalLabel">
+                            <i class="fas fa-file-contract me-2"></i>QUY ĐỊNH VÀ ĐIỀU KHOẢN GIAO DỊCH
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-dark">
+                        <section class="mb-4">
+                            <h6 class="fw-bold text-danger"><i class="fas fa-ticket-alt me-2"></i>1. QUY ĐỊNH ĐẶT VÉ VÀ
+                                GIAO DỊCH</h6>
+                            <ul class="small text-muted ps-3">
+                                <li>Vé đã thanh toán thành công <strong>không thể thay đổi</strong> suất chiếu, loại ghế
+                                    hoặc hoàn tiền dưới bất kỳ hình thức nào.</li>
+                                <li>Giao dịch sẽ bị hủy nếu quá trình thanh toán không hoàn tất trong vòng 10 phút kể từ
+                                    khi giữ ghế.</li>
+                            </ul>
+                        </section>
+
+                        <section class="mb-4">
+                            <h6 class="fw-bold text-danger"><i class="fas fa-user-check me-2"></i>2. PHÂN LOẠI ĐỘ TUỔI
+                                (QUAN TRỌNG)</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered small text-center align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nhãn</th>
+                                            <th>Mô tả quy định độ tuổi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-success">P</span></td>
+                                            <td class="text-start">Phim dành cho mọi lứa tuổi.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-primary">T13</span></td>
+                                            <td class="text-start">Dành cho khán giả từ đủ 13 tuổi trở lên.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-warning text-dark">T16</span></td>
+                                            <td class="text-start">Dành cho khán giả từ đủ 16 tuổi trở lên.</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-danger">T18</span></td>
+                                            <td class="text-start">Dành cho khán giả từ đủ 18 tuổi trở lên.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="small text-danger italic">* Rạp có quyền từ chối vào cửa nếu khán giả không xuất
+                                trình được giấy tờ tùy thân (CCCD/Thẻ học sinh) để chứng minh độ tuổi.</p>
+                        </section>
+
+                        <section class="mb-4">
+                            <h6 class="fw-bold text-danger"><i class="fas fa-popcorn me-2"></i>3. QUY ĐỊNH TẠI RẠP CHIẾU
+                            </h6>
+                            <ul class="small text-muted ps-3">
+                                <li>Vui lòng không mang thức ăn, nước uống từ bên ngoài vào rạp.</li>
+                                <li>Có mặt tại quầy vé ít nhất 15 phút trước giờ chiếu để thực hiện thủ tục kiểm soát.
+                                </li>
+                                <li>Nghiêm cấm quay phim, chụp ảnh hoặc ghi âm nội dung phim dưới mọi hình thức. Vi phạm
+                                    sẽ bị xử lý theo pháp luật hiện hành.</li>
+                            </ul>
+                        </section>
+
+                        <div class="alert alert-warning small d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+                            <div>Bằng việc nhấn nút <strong>"Tôi đã đọc và đồng ý"</strong>, bạn xác nhận đã hiểu rõ các
+                                quy định trên và cam kết thực hiện đúng.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-3 bg-light">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">ĐÓNG</button>
+                        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm"
+                            onclick="acceptTermsFromModal()">
+                            TÔI ĐÃ ĐỌC VÀ ĐỒNG Ý ĐIỀU KHOẢN
                         </button>
                     </div>
                 </div>
@@ -67,6 +210,30 @@
 
         <%- include('partials/footer') %>
 
+            <script>
+                const chk = document.getElementById('agreeTerms');
+                const btnPay = document.getElementById('btnPayment');
+                const modal = new bootstrap.Modal(document.getElementById('termsModal'));
+
+                // Xử lý nút Đồng ý trong Modal
+                function acceptTermsFromModal() {
+                    chk.checked = true;
+                    btnPay.disabled = false;
+                    modal.hide();
+                }
+
+                // Theo dõi thay đổi checkbox bên ngoài
+                chk.addEventListener('change', () => btnPay.disabled = !chk.checked);
+
+                // Hàm gọi trước khi submit
+                function validateAndSubmit() {
+                    if (!chk.checked) {
+                        alert("Vui lòng đồng ý điều khoản!");
+                        return;
+                    }
+                    submitOrder(); // Gọi hàm từ thanhtoan.js
+                }
+            </script>
             <script src="/js/thanhtoan.js"></script>
 </body>
 

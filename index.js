@@ -51,6 +51,10 @@ const homeRouter = require('./routers/homeRouter');
 
 // --- ROUTES GIAO DIỆN (VIEW ROUTES) ---
 app.get('/login', (req, res) => res.render('login'));
+app.get('/profile', (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    res.render('profile', { user: req.session.user });
+});
 app.get('/register', (req, res) => res.render('register'));
 app.get('/chitietphim', (req, res) => res.render('chitietphim'));
 app.get('/datve', (req, res) => res.render('datve'));

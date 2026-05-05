@@ -4,10 +4,74 @@
 <head>
     <%- include('partials/head') %>
         <link rel="stylesheet" href="/css/sodoghe.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
         <title>Chọn Ghế - CinéHub</title>
+        <style>
+            /* =========================================
+   ========================================= */
+            :root {
+                --brand-red: #dc3545;
+                --dark-bg: #080808;
+            }
+
+            .loader-content {
+                text-align: center;
+                transition: opacity 0.5s ease, transform 0.5s ease;
+            }
+
+            .brand-logo {
+                font-family: 'Inter', sans-serif;
+                font-size: 4rem;
+                font-weight: 900;
+                color: #fff;
+                letter-spacing: 15px;
+                text-transform: uppercase;
+                /* Hiệu ứng ánh kim nhẹ */
+                background: linear-gradient(45deg, #fff 30%, var(--brand-red), #fff 70%);
+                background-size: 200% auto;
+                -webkit-text-fill-color: transparent;
+                animation: shine 3s linear infinite;
+            }
+
+            @keyframes shine {
+                to {
+                    background-position: 200% center;
+                }
+            }
+
+            .dot {
+                width: 6px;
+                height: 6px;
+                background: var(--brand-red);
+                border-radius: 50%;
+                animation: pulse 1.4s infinite ease-in-out both;
+            }
+
+            .dot:nth-child(1) {
+                animation-delay: -0.32s;
+            }
+
+            .dot:nth-child(2) {
+                animation-delay: -0.16s;
+            }
+
+            @keyframes pulse {
+
+                0%,
+                80%,
+                100% {
+                    transform: scale(0);
+                }
+
+                40% {
+                    transform: scale(1);
+                }
+            }
+        </style>
 </head>
 
 <body class="seat-selection-page bg-dark text-white">
+
     <%- include('partials/header') %>
 
         <div class="container-fluid mt-4 mb-5 px-lg-5">
@@ -17,53 +81,72 @@
                         <div class="screen-container mb-5">
                             <div class="screen-curve mx-auto"></div>
                             <div class="screen-glow mx-auto"></div>
-                            <p class="text-center screen-text">MÀN HÌNH</p>
+                            <p class="text-center screen-text text-secondary small uppercase"
+                                style="letter-spacing: 5px;">MÀN HÌNH</p>
                         </div>
 
                         <div id="seat-map" class="mb-5">
                             <div class="text-center py-5">
                                 <div class="spinner-border text-danger" role="status"></div>
-                                <p class="mt-2 text-white-50">Đang tải sơ đồ ghế...</p>
+                                <p class="mt-2 text-white-50">Đang khởi tạo sơ đồ ghế...</p>
                             </div>
                         </div>
 
                         <div
                             class="legend-container d-flex justify-content-center gap-4 flex-wrap small pt-4 border-top border-secondary">
-                            <div class="legend-item"><span class="badge seat-item available"></span> Thường</div>
-                            <div class="legend-item"><span class="badge seat-item available vip"></span> VIP</div>
-                            <div class="legend-item"><span class="badge seat-item selected"></span> Đang chọn</div>
-                            <div class="legend-item"><span class="badge seat-item occupied"></span> Đã đặt</div>
+                            <div class="legend-item d-flex align-items-center gap-2">
+                                <span class="badge seat-item available"
+                                    style="width: 20px; height: 20px; background: #444; display: inline-block; border-radius: 4px;"></span>
+                                Thường
+                            </div>
+                            <div class="legend-item d-flex align-items-center gap-2">
+                                <span class="badge seat-item available vip"
+                                    style="width: 20px; height: 20px; background: #ffc107; display: inline-block; border-radius: 4px;"></span>
+                                VIP
+                            </div>
+                            <div class="legend-item d-flex align-items-center gap-2">
+                                <span class="badge seat-item selected"
+                                    style="width: 20px; height: 20px; background: #dc3545; display: inline-block; border-radius: 4px;"></span>
+                                Đang chọn
+                            </div>
+                            <div class="legend-item d-flex align-items-center gap-2">
+                                <span class="badge seat-item occupied"
+                                    style="width: 20px; height: 20px; background: #111; display: inline-block; border-radius: 4px; opacity: 0.5;"></span>
+                                Đã đặt
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="sidebar-sticky">
-                        <div class="order-summary-container shadow-lg p-4">
-                            <h2 id="display-movie-name" class="movie-title text-danger fw-bold mb-3">Tên Phim</h2>
-                            <div class="movie-info d-flex gap-2 text-secondary mb-3 small">
-                                <span id="display-cinema-room">Rạp - Phòng</span> |
-                                <span id="display-time">--:--</span>
-                            </div>
-
-                            <hr class="border-secondary my-4">
-
-                            <div class="d-flex justify-content-between mb-3 seat-details">
-                                <span>Ghế:</span>
-                                <b id="selected-seats-text" class="text-warning text-end ms-2">Chưa chọn</b>
-                            </div>
-
-                            <div
-                                class="price-container d-flex justify-content-between align-items-center mt-4 pt-4 border-top border-secondary">
-                                <span class="fs-5 text-secondary">Tổng tiền:</span>
-                                <h3 id="total-price" class="text-danger fw-bold mb-0">0 VNĐ</h3>
-                            </div>
-
-                            <button class="btn btn-danger w-100 mt-5 fw-bold py-3 fs-5 btn-confirm-booking"
-                                onclick="confirmBooking()">
-                                XÁC NHẬN ĐẶT VÉ
-                            </button>
+                    <div class="order-summary-container shadow-lg p-4 border border-secondary">
+                        <h2 id="display-movie-name" class="movie-title text-danger fw-bold mb-3">Tên Phim</h2>
+                        <div class="movie-info d-flex gap-2 text-secondary mb-3 small">
+                            <span id="display-cinema-room">Rạp - Phòng</span> |
+                            <span id="display-time">--:--</span>
                         </div>
+
+                        <hr class="border-secondary my-4">
+
+                        <div class="seat-selection-details">
+                            <p class="mb-2 text-secondary small text-uppercase" style="letter-spacing: 1px;">Ghế đã
+                                chọn:</p>
+                            <!-- Thay id 'selected-seats-text' từ thẻ <b> sang thẻ <div> để chứa danh sách -->
+                            <div id="selected-seats-text" class="mb-3">
+                                <span class="text-muted italic">Chưa chọn ghế nào</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="price-container d-flex justify-content-between align-items-center mt-4 pt-4 border-top border-secondary">
+                            <span class="fs-5 text-secondary">Tổng cộng:</span>
+                            <h3 id="total-price" class="text-danger fw-bold mb-0">0 VNĐ</h3>
+                        </div>
+
+                        <button class="btn btn-danger w-100 mt-5 fw-bold py-3 fs-5 btn-confirm-booking"
+                            onclick="confirmBooking()">
+                            XÁC NHẬN ĐẶT VÉ
+                        </button>
                     </div>
                 </div>
             </div>
@@ -71,18 +154,17 @@
 
         <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-content bg-dark text-white border-secondary shadow-lg">
                     <div class="modal-header border-secondary">
                         <h5 class="modal-title text-danger fw-bold">CHỌN BẮP NƯỚC & ƯU ĐÃI</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <div id="product-list" class="row g-3">
-                        </div>
+                        <div id="product-list" class="row g-3"></div>
                     </div>
                     <div class="modal-footer border-secondary justify-content-between">
                         <div>
-                            <span class="text-secondary">Tổng cộng:</span>
+                            <span class="text-secondary small">Tạm tính:</span>
                             <h4 id="total-final" class="text-warning fw-bold mb-0">0 VNĐ</h4>
                         </div>
                         <button type="button" class="btn btn-danger px-5 fw-bold" onclick="goToPayment()">THANH
@@ -96,6 +178,7 @@
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             <script src="/js/seat.js"></script>
+
 </body>
 
 </html>
