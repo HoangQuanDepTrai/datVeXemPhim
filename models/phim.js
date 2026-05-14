@@ -14,6 +14,19 @@ class PhimModel {
         `);
         return result.recordset;
     }
+    async getPhimHienThi() {
+        const pool = await poolPromise;
+        const result = await pool.request().query(`
+        SELECT 
+            p.*, 
+            tl.TEN_THE_LOAI,
+            (SELECT MIN(NGAY_CHIEU) FROM SUAT_CHIEU sc WHERE sc.MA_PHIM = p.MA_PHIM) AS NGAY_KHOI_CHIEU
+        FROM PHIM p
+        LEFT JOIN THE_LOAI tl ON p.MA_THE_LOAI = tl.MA_THE_LOAI
+        WHERE p.TRANG_THAI = 1 -- CHỈ LẤY PHIM ĐANG HIỆN
+    `);
+        return result.recordset;
+    }
     // Lấy chi tiết 1 bộ phim
     async getById(id) {
         const pool = await poolPromise;
@@ -73,15 +86,6 @@ class PhimModel {
                 WHERE MA_PHIM = @id
             `);
     }
-
-    // Xóa phim
-    async hide(id) {
-        const pool = await poolPromise;
-        return await pool.request()
-            .input('id', sql.Int, id)
-            .query("UPDATE PHIM SET TRANG_THAI = 0 WHERE MA_PHIM = @id");
-    }
-    // Thêm vào bên trong class PhimModel (file models/phim.js)
     // Lấy các phim mà User đã mua vé thành công
     async getPhimDaXem(maND) {
         const pool = await poolPromise;
@@ -96,6 +100,14 @@ class PhimModel {
                 AND hd.TRANG_THAI_THANH_TOAN IN (N'Thành công', N'Đã thanh toán')
             `);
         return result.recordset;
+    }
+    // Hàm này xử lý cả ẩn (status=0) và hiện (status=1)
+    async updateStatus(id, status) {
+        const pool = await poolPromise;
+        return await pool.request()
+            .input('id', sql.Int, id)
+            .input('status', sql.Int, status)
+            .query("UPDATE PHIM SET TRANG_THAI = @status WHERE MA_PHIM = @id");
     }
 }
 

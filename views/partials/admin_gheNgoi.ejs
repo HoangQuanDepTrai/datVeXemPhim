@@ -1,0 +1,100 @@
+<!-- Modal Tạo Sơ Đồ Ghế (Giao diện trực quan mới) -->
+<div class="modal fade" id="modalInteractiveSeats" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold"><i class="bi bi-grid-3x3"></i> Thiết Kế Sơ Đồ Ghế Trực Quan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="alert alert-danger small">
+                    <b>Lưu ý:</b> Lưu cấu hình này sẽ <b>XÓA SẠCH</b> ghế cũ và tạo mới. Click vào ghế để đổi:
+                    Thường ➔ VIP ➔ Trống.
+                </div>
+
+                <div class="row mb-3 bg-white p-3 rounded shadow-sm align-items-end">
+                    <div class="col-md-3">
+                        <label class="fw-bold form-label">Số Hàng (A, B...)</label>
+                        <input type="number" id="inputSoHang" class="form-control" value="10" min="1" max="26">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="fw-bold form-label">Số Cột (1, 2...)</label>
+                        <input type="number" id="inputSoCot" class="form-control" value="14" min="1" max="50">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-dark w-100 fw-bold" id="btnPreviewMap">
+                            <i class="bi bi-pencil-square"></i> Vẽ Lưới Ghế Nháp
+                        </button>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <input type="hidden" id="genMaPhong">
+                    </div>
+                </div>
+
+                <!-- Khu vực hiển thị sơ đồ nháp -->
+                <div id="previewMapContainer" class="p-3 bg-dark rounded shadow-inner text-center"
+                    style="display: none;">
+                    <div class="screen-area w-75 text-dark mb-4">MÀN HÌNH CHIẾU</div>
+                    <div id="previewSeatsHTML"></div>
+
+                    <!-- Chú thích -->
+                    <div class="d-flex justify-content-center gap-4 mt-4 pb-2 text-white border-top pt-3">
+                        <div><span class="badge bg-secondary d-inline-block" style="width:20px;height:20px;"></span>
+                            Thường</div>
+                        <div><span class="badge bg-danger border border-warning d-inline-block"
+                                style="width:20px;height:20px;"></span> VIP</div>
+                        <div><span class="badge bg-transparent border border-light d-inline-block"
+                                style="width:20px;height:20px; border-style: dashed !important;"></span>
+                            Trống/Lối đi</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-warning text-dark fw-bold" id="btnSaveCustomMap"
+                    style="display: none;">
+                    LƯU SƠ ĐỒ NÀY VÀO DATA
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Chỉnh Sửa Trạng Thái Ghế (Báo hỏng) -->
+<div class="modal fade" id="modalEditSeats" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-tools"></i> Quản lý bảo trì ghế - <span
+                        id="editRoomName"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="alert alert-info small shadow-sm">
+                    <b>Hướng dẫn:</b> Click vào ghế để chuyển thành <b>"Hư hỏng/Bảo trì"</b> (Ghế sẽ bị làm mờ và khóa
+                    không cho đặt). Click lần nữa để phục hồi trạng thái cũ.
+                </div>
+
+                <div id="editMapContainer" class="p-3 bg-dark rounded shadow-inner text-center">
+                    <div class="screen-area w-75 text-dark mb-4">MÀN HÌNH CHIẾU</div>
+                    <div id="editSeatsHTML"></div>
+
+                    <!-- Chú thích -->
+                    <div class="d-flex justify-content-center gap-4 mt-4 pb-2 text-white border-top pt-3">
+                        <div><span class="badge bg-secondary d-inline-block" style="width:20px;height:20px;"></span>
+                            Thường</div>
+                        <div><span class="badge bg-danger border border-warning d-inline-block"
+                                style="width:20px;height:20px;"></span> VIP</div>
+                        <div><span class="badge bg-dark border border-secondary d-inline-block opacity-50"
+                                style="width:20px;height:20px; text-decoration: line-through;"></span> Đang hỏng</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary fw-bold px-4" id="btnSaveEditedSeats">
+                    <i class="bi bi-save"></i> LƯU THAY ĐỔI
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

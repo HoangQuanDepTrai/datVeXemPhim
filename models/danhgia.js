@@ -1,20 +1,21 @@
 const { poolPromise, sql } = require('../config/db');
 
 class DanhGiaModel {
-    // Lưu đánh giá của khách hàng về phim
-    async create(maPhim, maND, noiDung) {
+    // 1. Sửa hàm create để nhận đủ 4 tham số và lưu vào đúng cột DIEM
+    async create(maPhim, maND, rating, noiDung) {
         const pool = await poolPromise;
         await pool.request()
             .input('pId', sql.Int, maPhim)
             .input('uId', sql.Int, maND)
-            .input('content', sql.NVarChar(sql.MAX), noiDung)
+            .input('score', sql.Int, rating) // Thêm input cho điểm số (Rating)
+            .input('content', sql.NVarChar(sql.MAX), noiDung) // Đây mới là nội dung thật
             .query(`
-                INSERT INTO DANH_GIA (MA_PHIM, MA_NGUOI_DUNG, NOI_DUNG_DANH_GIA, NGAY_DANH_GIA)
-                VALUES (@pId, @uId, @content, GETDATE())
+                INSERT INTO DANH_GIA (MA_PHIM, MA_NGUOI_DUNG, DIEM, NOI_DUNG_DANH_GIA, NGAY_DANH_GIA)
+                VALUES (@pId, @uId, @score, @content, GETDATE())
             `);
     }
 
-    // Lấy tất cả bình luận của một bộ phim để hiển thị
+    // 2. Lấy tất cả bình luận của một bộ phim
     async getByPhim(maPhim) {
         const pool = await poolPromise;
         const result = await pool.request()
@@ -28,6 +29,8 @@ class DanhGiaModel {
             `);
         return result.recordset;
     }
+
+    // 3. Lấy đánh giá mới nhất để hiện ra trang "Góc Review"
     async getRecentReviews(limit = 6) {
         const pool = await poolPromise;
         const result = await pool.request()
@@ -45,4 +48,5 @@ class DanhGiaModel {
         return result.recordset;
     }
 }
+
 module.exports = new DanhGiaModel();

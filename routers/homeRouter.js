@@ -9,10 +9,9 @@ router.get('/', homeController.getHomePage);
 // Trang Rạp chiếu
 router.get('/rap-chieu', homeController.getRapChieuPage);
 
-// Trang Review phim (Lấy danh sách review hiện ra trang)
+// Trang Rview phim (Lấy danh sách review hiện ra trang)
 router.get('/review-phim', homeController.getReviewPage);
-
-// [ĐÃ SỬA] Thay thế bằng API để nhận data Đánh giá bằng AJAX
+//Thay thế bằng API để nhận data Đánh giá bằng AJAX
 router.post('/api/phim/danh-gia', homeController.submitReviewAPI);
 
 module.exports = router;

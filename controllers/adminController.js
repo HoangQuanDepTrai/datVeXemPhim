@@ -10,7 +10,14 @@ const axios = require('axios');
 
 class AdminController {
     // ==========================================
-    // 1. QUẢN LÝ PHIM
+    // 1. DASHBOARD CHÍNH CỦA ADMIN
+    // ==========================================
+    renderDashboardHome(req, res) {
+        res.render('admin/dashboard');
+    }
+
+    // ==========================================
+    // 2. QUẢN LÝ PHIM
     // ==========================================
     async listPhim(req, res) {
         try {
@@ -34,13 +41,13 @@ class AdminController {
             // 2. Xử lý Poster: Ưu tiên lấy File upload, nếu không có thì lấy Link
             let poster = posterLink; // Mặc định là link Duy dán vào
             if (req.files && req.files['posterFile']) {
-                poster = `/image/${req.files['posterFile'][0].filename}`;
+                poster = `/images/${req.files['posterFile'][0].filename}`;
             }
 
             // 3. Xử lý Ảnh nền: Ưu tiên lấy File upload, nếu không có thì lấy Link
             let nen = nenLink; // Mặc định là link Duy dán vào
             if (req.files && req.files['nenFile']) {
-                nen = `/image/${req.files['nenFile'][0].filename}`;
+                nen = `/images/${req.files['nenFile'][0].filename}`;
             }
 
             // 4. Kiểm tra dữ liệu bắt buộc (Tránh để trống cả link và file)
@@ -65,14 +72,19 @@ class AdminController {
         }
     }
 
-    async hidePhim(req, res) {
+    async updateMovieStatus(req, res) {
         try {
             const { id } = req.params;
-            await phimModel.hide(id); // Gọi hàm hide vừa tạo
-            res.json({ success: true, message: "Đã ẩn phim khỏi danh sách hiển thị!" });
+            const { status } = req.body; // Lấy status (0 hoặc 1) từ Frontend gửi lên
+
+            // Gọi hàm updateStatus mới trong Model
+            await phimModel.updateStatus(id, status);
+
+            const action = status == 1 ? "hiển thị" : "ẩn";
+            res.json({ success: true, message: `Đã ${action} phim thành công!` });
         } catch (error) {
-            console.error("Lỗi khi ẩn phim:", error.message);
-            res.status(500).json({ success: false, message: "Không thể ẩn phim." });
+            console.error("Lỗi khi cập nhật trạng thái phim:", error.message);
+            res.status(500).json({ success: false, message: "Không thể cập nhật trạng thái phim." });
         }
     }
 
@@ -244,6 +256,35 @@ class AdminController {
             res.status(500).json({ success: false, message: "Lỗi server khi lấy sơ đồ ghế" });
         }
     }
+    async updateGheStatus(req, res) {
+        try {
+            const { seats } = req.body;
+            await gheModel.updateStatus(seats);
+            res.json({ success: true, message: "Đã cập nhật trạng thái ghế" });
+        } catch (error) {
+            res.status(500).json({ success: false, message: "Lỗi hệ thống khi cập nhật ghế" });
+        }
+    }
+    async generateCustomSeats(req, res) {
+        try {
+            const { maPhong, danhSachGhe } = req.body;
+
+            // Gọi Model xử lý toàn bộ logic truy vấn
+            await gheModel.recreateCustomSeats(maPhong, danhSachGhe);
+
+            res.json({
+                success: true,
+                message: "Đã cập nhật sơ đồ ghế tùy chỉnh thành công!"
+            });
+
+        } catch (error) {
+            console.error("Lỗi Controller generateCustomSeats:", error.message);
+            res.status(500).json({
+                success: false,
+                message: "Lỗi khi lưu sơ đồ ghế: " + error.message
+            });
+        }
+    }
     // ==========================================
     // 5. QUẢN LÝ THỐNG KÊ (DASHBOARD)
     // ==========================================
@@ -267,10 +308,29 @@ class AdminController {
     async listUsers(req, res) {
         try {
             const users = await taiKhoanModel.getAll();
-            res.render('admin/users', { users: users });
+            res.render('admin/nguoidung', { users: users });
+
         } catch (error) {
             console.error("Lỗi tải danh sách người dùng:", error.message);
             res.status(500).send("Lỗi tải danh sách người dùng.");
+        }
+    }
+    // khoaMoTaiKhoan 
+    async khoaMoTaiKhoan(req, res) {
+        try {
+            const { id, currentStatus } = req.body;
+
+            // Đảo ngược trạng thái: Nếu đang là 1 (Hoạt động) thì đổi thành 0 (Bị khóa), và ngược lại
+            const newStatus = parseInt(currentStatus) === 1 ? 0 : 1;
+
+            await taiKhoanModel.updateStatus(id, newStatus);
+
+            const message = newStatus === 1 ? "Đã mở khóa tài khoản thành công!" : "Đã khóa tài khoản thành công!";
+            res.json({ success: true, message: message });
+
+        } catch (error) {
+            console.error("Lỗi cập nhật trạng thái User:", error);
+            res.status(500).json({ success: false, message: "Lỗi server không thể cập nhật." });
         }
     }
 

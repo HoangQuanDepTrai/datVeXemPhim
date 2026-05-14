@@ -9,7 +9,7 @@
         <a href="/admin/suat-chieu" class="menu-item"><i class="bi bi-calendar-week"></i> Suất Chiếu</a>
         <a href="/admin/phong" class="menu-item"><i class="bi bi-ui-checks-grid"></i> Phòng & Ghế</a>
         <a href="/admin/hoa-don" class="menu-item"><i class="bi bi-receipt"></i> Hóa Đơn</a>
-        <a href="/admin/users" class="menu-item"><i class="bi bi-people"></i> Khách Hàng</a>
+        <a href="/admin/nguoidung" class="menu-item"><i class="bi bi-people"></i> Người Dùng</a>
         <a href="/admin/rap" class="menu-item"><i class="bi bi-building"></i> Rạp Chiếu</a>
         <a href="/admin/doanh-thu" class="menu-item"><i class="bi bi-graph-up-arrow"></i> Doanh Thu</a>
         <hr class="mx-3 opacity-20">
@@ -17,4 +17,23 @@
         <a href="javascript:void(0)" onclick="logout()" class="menu-item text-danger"><i
                 class="bi bi-box-arrow-left"></i> Thoát</a>
     </div>
+    <script>
+        function logout() {
+            // Sử dụng SweetAlert2 để hỏi cho chuyên nghiệp
+            Swal.fire({
+                title: 'Xác nhận thoát',
+                text: "Bạn có chắc chắn muốn đăng xuất không?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6e7881',
+                confirmButtonText: 'Đăng xuất',
+                cancelButtonText: 'Ở lại'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'api/auth/logout';
+                }
+            });
+        }
+    </script>
 </div>

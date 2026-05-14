@@ -1,0 +1,37 @@
+<!-- Modal Thêm Phòng -->
+<div class="modal fade" id="modalAddPhong" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">Thêm Phòng Chiếu Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/admin/phong/add" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Thuộc Rạp <span class="text-danger">*</span></label>
+                        <select name="maRap" class="form-select" required>
+                            <option value="">-- Chọn rạp --</option>
+                            <% if (typeof raps !=='undefined' ) { %>
+                                <% raps.forEach(rap=> { %>
+                                    <option value="<%= rap._id || rap.MA_RAP %>">
+                                        <%= rap.tenRap || rap.TEN_RAP %>
+                                    </option>
+                                    <% }) %>
+                                        <% } %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold mb-1">Tên Phòng <span class="text-danger">*</span></label>
+                        <input type="text" name="tenPhong" class="form-control" placeholder="VD: P1, Cinema 1..."
+                            required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success fw-bold">Lưu Phòng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,38 +1,38 @@
 const veModel = require('../models/vexemphim');
+const hoadonModel = require('../models/hoadon');
 const vnpayService = require('../services/vnpayService');
 
 const pendingOrders = new Map();
 
 class VeController {
     // 1. HÀM ĐẶT VÉ (GỌI KHI KHÁCH BẤM NÚT "THANH TOÁN")
+    // 1. HÀM ĐẶT VÉ (GỌI KHI KHÁCH BẤM NÚT "THANH TOÁN")
     datVe = async (req, res) => {
         try {
             console.log("\n--- [START] KHỞI TẠO ĐƠN HÀNG MỚI ---");
-            const { maNguoiDung, maSuatChieu, danhSachMaGhe, tongTien } = req.body;
+            // SỬA Ở ĐÂY: Thêm danhSachCombo để hứng dữ liệu bắp nước
+            const { maNguoiDung, maSuatChieu, danhSachMaGhe, tongTien, danhSachCombo } = req.body;
 
             // Log dữ liệu đầu vào để kiểm tra
             console.log(`> Khách hàng ID: ${maNguoiDung}`);
             console.log(`> Suất chiếu ID: ${maSuatChieu}`);
             console.log(`> Danh sách ghế: ${danhSachMaGhe.join(', ')}`);
+            console.log(`> Bắp nước:`, danhSachCombo); // In ra xem có không
             console.log(`> Số tiền: ${tongTien} VND`);
 
-            // Tạo mã đơn hàng tạm thời (OrderId) bằng timestamp để duy nhất
             const orderId = Date.now().toString();
 
-            // LƯU THÔNG TIN VÀO RAM (Tuyệt đối không lưu SQL ở bước này)
+            // SỬA Ở ĐÂY: LƯU THÊM BẮP NƯỚC VÀO RAM
             pendingOrders.set(orderId, {
                 maNguoiDung,
                 maSuatChieu,
                 danhSachMaGhe,
-                tongTien
+                tongTien,
+                danhSachCombo // <--- PHẢI CÓ DÒNG NÀY NÓ MỚI NHỚ ĐƯỢC
             });
 
             console.log(`> Đã đưa đơn hàng ${orderId} vào RAM. Chờ khách thanh toán qua VNPay...`);
-
-            // Tạo link thanh toán VNPay gửi khách đi
             const paymentUrl = vnpayService.createPaymentUrl(req, tongTien, orderId);
-
-            console.log(`> Đã tạo link thanh toán thành công.`);
             res.json({ success: true, paymentUrl });
 
         } catch (error) {
@@ -91,7 +91,14 @@ class VeController {
                     await veModel.createVe(maHD, maGhe, orderData.maSuatChieu);
                     console.log(`Đã tạo vé cho ghế: ${maGhe}`);
                 }
-
+                if (orderData.danhSachCombo && orderData.danhSachCombo.length > 0) {
+                    // Cấu trúc danhSachCombo ví dụ: [{ maSP: 1, soLuong: 2 }, { maSP: 2, soLuong: 1 }]
+                    for (let combo of orderData.danhSachCombo) {
+                        // Gọi hàm mình vừa tạo ở Bước 1
+                        await veModel.createChiTietSanPham(maHD, combo.maSP, combo.soLuong, combo.giaBan);
+                        console.log(`[OK] Đã lưu sản phẩm ID: ${combo.maSP}, Số lượng: ${combo.soLuong}, Giá bán: ${combo.giaBan}đ vào chi tiết hóa đơn!`);
+                    }
+                }
                 pendingOrders.delete(orderId);
                 console.log("\nDATABASE ĐÃ CẬP NHẬT ĐẦY ĐỦ.");
                 console.log("=".repeat(50));

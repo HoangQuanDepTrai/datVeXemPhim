@@ -1,27 +1,35 @@
 const phimModel = require('../models/phim');
 const danhGiaModel = require('../models/danhgia');
 const rapModel = require('../models/rap');
+const { poolPromise } = require('../config/db');
 
 class HomeController {
     // 1. TRANG CHỦ (Hiển thị phim và 3 review mới nhất)
     async getHomePage(req, res) {
         try {
-            // Lấy dữ liệu song song để web load nhanh hơn
+            // Lấy pool kết nối từ poolPromise
+            const pool = await poolPromise;
+
+            // Load song song phim và đánh giá (giữ nguyên logic cũ của Duy)
             const [movies, recentReviews] = await Promise.all([
-                phimModel.getAll(),
-                danhGiaModel.getRecentReviews(3) // Lấy 3 đánh giá mới nhất cho trang chủ
+                phimModel.getPhimHienThi(),
+                danhGiaModel.getRecentReviews(3)
             ]);
 
-            // Cắt lấy 10 phim đầu tiên để đưa lên mục "Phim Đang Chiếu"
+            // Sử dụng pool để query thể loại
+            const genresResult = await pool.request().query("SELECT TEN_THE_LOAI AS THE_LOAI FROM THE_LOAI");
+            const genres = genresResult.recordset;
+
             const heroMovies = movies.slice(0, 10);
 
             res.render('index', {
                 heroMovies: heroMovies,
-                recentReviews: recentReviews
+                recentReviews: recentReviews,
+                genres: genres
             });
         } catch (error) {
             console.error("Lỗi tải trang chủ:", error);
-            res.status(500).send("Lỗi server khi tải trang chủ.");
+            res.status(500).send("Lỗi server.");
         }
     }
 
@@ -76,12 +84,11 @@ class HomeController {
             const { maPhim, rating, noiDung } = req.body;
 
             // 3. RÀNG BUỘC (Tùy chọn ăn điểm 10): Kiểm tra xem user đã mua vé phim này chưa?
-            /* const phimDaXem = await phimModel.getPhimDaXem(user.MA_NGUOI_DUNG);
+            const phimDaXem = await phimModel.getPhimDaXem(user.MA_NGUOI_DUNG);
             const daMuaVe = phimDaXem.some(p => p.MA_PHIM == maPhim);
             if (!daMuaVe) {
                 return res.status(403).json({ success: false, message: "Bạn phải mua vé và xem phim này mới được đánh giá!" });
             }
-            */
 
             // 4. Lưu vào Database (Nhớ update hàm create trong Model để nhận thêm biến rating nhé)
             await danhGiaModel.create(maPhim, user.MA_NGUOI_DUNG, rating, noiDung);

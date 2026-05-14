@@ -4,39 +4,43 @@
 <head>
     <%- include('../partials/head') %>
         <link rel="stylesheet" href="/css/admin_dashboard.css">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
         <title>Quản lý Hóa Đơn - Admin</title>
 </head>
 
 <body class="bg-light">
     <%- include('../partials/admin_sidebar') %>
 
-        <div class="container py-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0" style="color: #6f42c1;"><i class="bi bi-receipt"></i> Quản Lý Hóa Đơn & Vé</h4>
-                    <a href="/admin" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Về Dashboard</a>
+        <div class="main-content">
+            <div class="top-nav mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="fw-bold mb-0" style="color: #6f42c1;">
+                        <i class="bi bi-receipt-cutoff me-2"></i>Hệ thống / <small class="text-muted">Hóa Đơn &
+                            Vé</small>
+                    </h4>
                 </div>
-                <div class="card-body">
+            </div>
+
+            <div class="card border-0 shadow-sm p-0 rounded-4 mb-5">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle mb-0 table-admin">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Mã HĐ</th>
+                                    <th class="ps-4">STT</th>
                                     <th>Khách Hàng</th>
                                     <th>SĐT</th>
                                     <th>Phim Đặt</th>
-                                    <th>Ngày Đặt</th>
-                                    <th>Tổng Tiền</th>
-                                    <th>Trạng Thái</th>
+                                    <th class="text-center">Ngày Đặt</th>
+                                    <th class="text-end">Tổng Tiền</th>
+                                    <th class="text-center no-sort">Trạng Thái</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% hoaDons.forEach(hd=> { %>
                                     <tr>
-                                        <td class="fw-bold">#<%= hd.MA_HOA_DON %>
+                                        <td class="fw-bold ps-4 text-secondary">#<%= hd.MA_HOA_DON %>
                                         </td>
-                                        <td>
+                                        <td class="fw-bold text-dark">
                                             <%= hd.HO_TEN %>
                                         </td>
                                         <td>
@@ -45,22 +49,24 @@
                                         <td class="fw-bold text-primary">
                                             <%= hd.TEN_PHIM %>
                                         </td>
-                                        <td>
+                                        <td class="text-center text-muted">
                                             <% const d=new Date(hd.NGAY_DAT_VE); const
                                                 dateStr=d.toLocaleDateString('vi-VN') + ' ' +
                                                 d.toLocaleTimeString('vi-VN', {hour: '2-digit' , minute:'2-digit'}); %>
                                                 <%= dateStr %>
                                         </td>
-                                        <td class="fw-bold text-danger">
+                                        <td class="fw-bold text-danger text-end pe-3">
                                             <%= hd.TONG_TIEN_THANH_TOAN.toLocaleString('vi-VN') %> đ
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <% if(hd.TRANG_THAI_THANH_TOAN==='Đã thanh toán' ) { %>
-                                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Đã
-                                                    thanh
-                                                    toán</span>
+                                                <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm">
+                                                    <i class="bi bi-check-circle me-1"></i> Đã thanh toán
+                                                </span>
                                                 <% } else { %>
-                                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i>
+                                                    <span
+                                                        class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">
+                                                        <i class="bi bi-clock me-1"></i>
                                                         <%= hd.TRANG_THAI_THANH_TOAN %>
                                                     </span>
                                                     <% } %>
@@ -74,6 +80,7 @@
             </div>
         </div>
 
+        <%- include('../partials/admin_scripts') %>
 </body>
 
 </html>
