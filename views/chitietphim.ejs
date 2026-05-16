@@ -3,298 +3,284 @@
 
 <head>
     <%- include('partials/head') %>
-        <title id="movie-title-tab">Chi Tiết Phim - CinéHub</title>
-        <link rel="stylesheet" href="/css/chitietphim.css">
+    <title id="movie-title-tab">Chi Tiết Phim - CinéHub</title>
+    <link rel="stylesheet" href="/css/chitietphim.css">
 </head>
 
 <body class="bg-light text-dark">
     <%- include('partials/header') %>
 
-        <div class="position-relative bg-dark text-white overflow-hidden py-5" style="min-height: 450px;">
-            <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
-                style="background: url('') center/cover no-repeat; filter: blur(10px);" id="hero-backdrop-img">
-            </div>
+    <div class="position-relative bg-dark text-white overflow-hidden py-5" style="min-height: 450px;">
+        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" 
+             style="background: url('') center/cover no-repeat; filter: blur(10px);" id="hero-backdrop-img">
+        </div>
 
-            <div class="container position-relative">
-                <div class="row align-items-center">
-                    <div class="col-lg-3 col-md-4 text-center">
-                        <img id="movie-poster" src="" class="img-fluid rounded-3 shadow-lg border border-secondary"
-                            alt="Poster">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-3 col-md-4 text-center">
+                    <img id="movie-poster" src="" class="img-fluid rounded-3 shadow-lg border border-secondary" alt="Poster">
+                </div>
+                
+                <div class="col-lg-9 col-md-8 pt-4 pt-md-0">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-danger px-3 py-2">T13</span>
+                        <span id="movie-genre" class="badge border border-warning text-warning px-3 py-2">Hành động</span>
+                    </div>
+                    <h1 id="movie-name" class="display-4 fw-bold text-uppercase mb-3"></h1>
+                    
+                    <div class="d-flex gap-4 mb-4 opacity-75">
+                        <span><i class="bi bi-clock me-2"></i><span id="movie-duration-badge">--</span></span>
+                        <span><i class="bi bi-calendar3 me-2"></i><span id="release-date-hero">--</span></span>
                     </div>
 
-                    <div class="col-lg-9 col-md-8 pt-4 pt-md-0">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-danger px-3 py-2">T13</span>
-                            <span id="movie-genre" class="badge border border-warning text-warning px-3 py-2">Hành
-                                động</span>
-                        </div>
-                        <h1 id="movie-name" class="display-4 fw-bold text-uppercase mb-3"></h1>
-
-                        <div class="d-flex gap-4 mb-4 opacity-75">
-                            <span><i class="bi bi-clock me-2"></i><span id="movie-duration-badge">--</span></span>
-                            <span><i class="bi bi-calendar3 me-2"></i><span id="release-date-hero">--</span></span>
-                        </div>
-
-                        <p id="movie-description" class="lead mb-4"
-                            style="max-width: 800px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                        </p>
-
-                        <a href="#booking-area" class="btn btn-danger btn-lg px-5 rounded-pill fw-bold shadow">
-                            <i class="bi bi-ticket-perforated me-2"></i>ĐẶT VÉ NGAY
-                        </a>
-                    </div>
+                    <p id="movie-description" class="lead mb-4" style="max-width: 800px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;"></p>
+                    
+                    <a href="#booking-area" class="btn btn-danger btn-lg px-5 rounded-pill fw-bold shadow">
+                        <i class="bi bi-ticket-perforated me-2"></i>ĐẶT VÉ NGAY
+                    </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="container py-5">
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <div id="booking-area" class="card border-0 shadow-sm rounded-4 mb-4">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold"><i class="bi bi-calendar2-week text-danger me-2"></i>LỊCH CHIẾU
-                            </h5>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div id="date-selector" class="d-flex overflow-auto gap-2 pb-3 mb-4 border-bottom">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div id="booking-area" class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-calendar2-week text-danger me-2"></i>LỊCH CHIẾU</h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div id="date-selector" class="d-flex overflow-auto gap-2 pb-3 mb-4 border-bottom">
                             </div>
 
-                            <div id="cinema-list-container">
-                                <div class="text-center py-5">
-                                    <div class="spinner-border text-danger" role="status"></div>
-                                    <p class="mt-2 text-muted">Đang tìm suất chiếu tốt nhất cho bạn...</p>
+                        <div id="cinema-list-container">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-danger" role="status"></div>
+                                <p class="mt-2 text-muted">Đang tìm suất chiếu tốt nhất cho bạn...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-play-circle-fill me-2"></i>TRAILER</h5>
+                    </div>
+                    <div class="ratio ratio-16x9">
+                        <iframe id="movie-trailer" src="" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-4 border-start border-4 border-danger ps-3">THÔNG TIN PHIM</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Đạo diễn</small>
+                                <span id="director" class="fw-semibold"></span>
+                            </li>
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Diễn viên</small>
+                                <span id="actors" class="fw-semibold"></span>
+                            </li>
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Khởi chiếu</small>
+                                <span id="release-date" class="fw-semibold"></span>
+                            </li>
+                            <li class="mb-3">
+                                <small class="text-muted d-block">Thời lượng</small>
+                                <span id="duration" class="fw-semibold"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-4 border-start border-4 border-warning ps-3">ĐÁNH GIÁ</h5>
+                        
+                        <% if (user) { %>
+                            <form id="formReview" onsubmit="submitReview(event)" class="bg-light p-3 rounded-3 mb-4">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Chọn số sao:</label>
+                                    <div class="star-rating h4 mb-0">
+                                        <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 sao">★</label>
+                                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 sao">★</label>
+                                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 sao">★</label>
+                                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 sao">★</label>
+                                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 sao">★</label>
+                                    </div>
                                 </div>
+                                <div class="mb-3">
+                                    <textarea id="review-content" class="form-control border-0 shadow-sm" rows="3" placeholder="Phim thế nào hả bạn?" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100 fw-bold rounded-pill">Gửi bình luận</button>
+                            </form>
+                        <% } else { %>
+                            <div class="alert alert-warning small border-0 shadow-sm">
+                                <i class="bi bi-info-circle me-1"></i> <a href="/login" class="fw-bold text-dark">Đăng nhập</a> để đánh giá phim.
                             </div>
-                        </div>
-                    </div>
+                        <% } %>
 
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-play-circle-fill me-2"></i>TRAILER</h5>
-                        </div>
-                        <div class="ratio ratio-16x9">
-                            <iframe id="movie-trailer" src="" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 mb-4">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-4 border-start border-4 border-danger ps-3">THÔNG TIN PHIM</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-3">
-                                    <small class="text-muted d-block">Đạo diễn</small>
-                                    <span id="director" class="fw-semibold"></span>
-                                </li>
-                                <li class="mb-3">
-                                    <small class="text-muted d-block">Diễn viên</small>
-                                    <span id="actors" class="fw-semibold"></span>
-                                </li>
-                                <li class="mb-3">
-                                    <small class="text-muted d-block">Khởi chiếu</small>
-                                    <span id="release-date" class="fw-semibold"></span>
-                                </li>
-                                <li class="mb-3">
-                                    <small class="text-muted d-block">Thời lượng</small>
-                                    <span id="duration" class="fw-semibold"></span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-4 border-start border-4 border-warning ps-3">ĐÁNH GIÁ</h5>
-
-                            <% if (user) { %>
-                                <form id="formReview" onsubmit="submitReview(event)"
-                                    class="bg-light p-3 rounded-3 mb-4">
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-bold">Chọn số sao:</label>
-                                        <div class="star-rating h4 mb-0">
-                                            <input type="radio" id="star5" name="rating" value="5" required /><label
-                                                for="star5" title="5 sao">★</label>
-                                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4"
-                                                title="4 sao">★</label>
-                                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3"
-                                                title="3 sao">★</label>
-                                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2"
-                                                title="2 sao">★</label>
-                                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1"
-                                                title="1 sao">★</label>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <textarea id="review-content" class="form-control border-0 shadow-sm" rows="3"
-                                            placeholder="Phim thế nào hả bạn?" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-pill">Gửi bình
-                                        luận</button>
-                                </form>
-                                <% } else { %>
-                                    <div class="alert alert-warning small border-0 shadow-sm">
-                                        <i class="bi bi-info-circle me-1"></i> <a href="/login"
-                                            class="fw-bold text-dark">Đăng nhập</a> để đánh giá phim.
-                                    </div>
-                                    <% } %>
-
-                                        <div id="comments-list" class="mt-3">
-                                        </div>
-                        </div>
+                        <div id="comments-list" class="mt-3">
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <%- include('partials/footer') %>
+    <%- include('partials/footer') %>
 
-            <script>
-                let currentMovieId = null;
-                let movieShowtimes = [];
-                let datesArray = [];
+  <script>
+    let currentMovieId = null;
+    let movieShowtimes = [];
+    let datesArray = [];
 
-                document.addEventListener('DOMContentLoaded', async () => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    currentMovieId = urlParams.get('id');
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentMovieId = urlParams.get('id');
 
-                    // 1. Tạo mảng 7 ngày
-                    generateSevenDays();
+        // 1. Tạo mảng 7 ngày
+        generateSevenDays();
 
-                    // 2. Tải chi tiết phim & Suất chiếu
-                    if (currentMovieId) {
-                        await loadMovieDetail(currentMovieId);
-                    }
-                });
+        // 2. Tải chi tiết phim & Suất chiếu
+        if (currentMovieId) {
+            await loadMovieDetail(currentMovieId);
+        }
+    });
 
-                // --- HÀM 1: TẠO 7 NGÀY ---
-                function generateSevenDays() {
-                    const today = new Date();
-                    const dayNames = ['CN', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7'];
-                    const selector = document.getElementById('date-selector');
-                    selector.innerHTML = '';
-                    datesArray = [];
+    // --- HÀM 1: TẠO 7 NGÀY ---
+    function generateSevenDays() {
+        const today = new Date();
+        const dayNames = ['CN', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7'];
+        const selector = document.getElementById('date-selector');
+        selector.innerHTML = '';
+        datesArray = [];
 
-                    for (let i = 0; i < 7; i++) {
-                        let d = new Date(today);
-                        d.setDate(d.getDate() + i);
+        for (let i = 0; i < 7; i++) {
+            let d = new Date(today);
+            d.setDate(d.getDate() + i);
 
-                        const dd = String(d.getDate()).padStart(2, '0');
-                        const mm = String(d.getMonth() + 1).padStart(2, '0');
-                        const yyyy = d.getFullYear();
-                        const dateString = `${dd}/${mm}/${yyyy}`;
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            const dateString = `${dd}/${mm}/${yyyy}`;
 
-                        const dayName = (i === 0) ? 'Hôm nay' : dayNames[d.getDay()];
-                        const dateDisplay = `${dd}/${mm}`;
+            const dayName = (i === 0) ? 'Hôm nay' : dayNames[d.getDay()];
+            const dateDisplay = `${dd}/${mm}`;
 
-                        // Tạo nút bằng thẻ button của Bootstrap để hạn chế CSS ngoài
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        // Dùng class Bootstrap: btn-outline-danger, p-2, flex-shrink-0
-                        btn.className = `btn ${i === 0 ? 'btn-danger' : 'btn-outline-secondary'} d-flex flex-column align-items-center flex-shrink-0 py-2 px-3 rounded-3 border-2`;
-                        btn.style.minWidth = "80px";
-                        btn.innerHTML = `
+            // Tạo nút bằng thẻ button của Bootstrap để hạn chế CSS ngoài
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            // Dùng class Bootstrap: btn-outline-danger, p-2, flex-shrink-0
+            btn.className = `btn ${i === 0 ? 'btn-danger' : 'btn-outline-secondary'} d-flex flex-column align-items-center flex-shrink-0 py-2 px-3 rounded-3 border-2`;
+            btn.style.minWidth = "80px";
+            btn.innerHTML = `
                 <small class="fw-bold" style="font-size: 0.7rem;">${dayName}</small>
                 <span class="h6 mb-0 fw-bold">${dateDisplay}</span>
             `;
 
-                        btn.onclick = function () {
-                            // Đổi màu nút khi click bằng class Bootstrap
-                            document.querySelectorAll('#date-selector button').forEach(el => {
-                                el.classList.remove('btn-danger');
-                                el.classList.add('btn-outline-secondary');
-                            });
-                            this.classList.remove('btn-outline-secondary');
-                            this.classList.add('btn-danger');
+            btn.onclick = function () {
+                // Đổi màu nút khi click bằng class Bootstrap
+                document.querySelectorAll('#date-selector button').forEach(el => {
+                    el.classList.remove('btn-danger');
+                    el.classList.add('btn-outline-secondary');
+                });
+                this.classList.remove('btn-outline-secondary');
+                this.classList.add('btn-danger');
+                
+                renderShowtimes(dateString);
+            };
 
-                            renderShowtimes(dateString);
-                        };
+            selector.appendChild(btn);
+            datesArray.push(dateString);
+        }
+    }
 
-                        selector.appendChild(btn);
-                        datesArray.push(dateString);
-                    }
-                }
+    // --- HÀM 2: TẢI CHI TIẾT PHIM ---
+    async function loadMovieDetail(id) {
+        try {
+            const res = await fetch(`/api/phim/detail/${id}`);
+            const movie = await res.json();
+            if (!movie) return;
 
-                // --- HÀM 2: TẢI CHI TIẾT PHIM ---
-                async function loadMovieDetail(id) {
-                    try {
-                        const res = await fetch(`/api/phim/detail/${id}`);
-                        const movie = await res.json();
-                        if (!movie) return;
+            // Cập nhật thông tin thẻ Tab & Text
+            document.title = movie.TEN_PHIM + " - CinéHub";
+            document.getElementById('movie-name').textContent = movie.TEN_PHIM;
+            document.getElementById('movie-poster').src = movie.HINH_ANH_POSTER;
+            
+            // Cập nhật Backdrop mờ phía sau
+            const backdrop = document.getElementById('hero-backdrop-img');
+            backdrop.style.backgroundImage = `url('${movie.HINH_ANH_POSTER}')`;
 
-                        // Cập nhật thông tin thẻ Tab & Text
-                        document.title = movie.TEN_PHIM + " - CinéHub";
-                        document.getElementById('movie-name').textContent = movie.TEN_PHIM;
-                        document.getElementById('movie-poster').src = movie.HINH_ANH_POSTER;
+            document.getElementById('movie-description').textContent = movie.NOI_DUNG_PHIM || "Nội dung đang cập nhật...";
+            document.getElementById('movie-genre').textContent = movie.TEN_THE_LOAI || 'Phim';
 
-                        // Cập nhật Backdrop mờ phía sau
-                        const backdrop = document.getElementById('hero-backdrop-img');
-                        backdrop.style.backgroundImage = `url('${movie.HINH_ANH_POSTER}')`;
+            const time = movie.THOI_LUONG_PHIM || 0;
+            document.getElementById('duration').textContent = time + " phút";
+            document.getElementById('movie-duration-badge').textContent = time + " phút";
 
-                        document.getElementById('movie-description').textContent = movie.NOI_DUNG_PHIM || "Nội dung đang cập nhật...";
-                        document.getElementById('movie-genre').textContent = movie.TEN_THE_LOAI || 'Phim';
+            const date = movie.NGAY_KHOI_CHIEU;
+            const formattedDate = date ? new Date(date).toLocaleDateString('vi-VN') : 'Đang cập nhật';
+            document.getElementById('release-date').textContent = formattedDate;
+            document.getElementById('release-date-hero').textContent = formattedDate;
+            
+            document.getElementById('director').textContent = movie.DAO_DIEN || 'Đang cập nhật';
+            document.getElementById('actors').textContent = movie.DIEN_VIEN || 'Đang cập nhật';
 
-                        const time = movie.THOI_LUONG_PHIM || 0;
-                        document.getElementById('duration').textContent = time + " phút";
-                        document.getElementById('movie-duration-badge').textContent = time + " phút";
+            // Trailer
+            const trailerUrl = movie.DUONG_DAN_TRAILER;
+            if (trailerUrl) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = trailerUrl.match(regExp);
+                if (match) document.getElementById('movie-trailer').src = `https://www.youtube.com/embed/${match[2]}`;
+            }
 
-                        const date = movie.NGAY_KHOI_CHIEU;
-                        const formattedDate = date ? new Date(date).toLocaleDateString('vi-VN') : 'Đang cập nhật';
-                        document.getElementById('release-date').textContent = formattedDate;
-                        document.getElementById('release-date-hero').textContent = formattedDate;
+            await loadShowtimes(id);
+        } catch (e) { console.error("Lỗi tải phim:", e); }
+    }
 
-                        document.getElementById('director').textContent = movie.DAO_DIEN || 'Đang cập nhật';
-                        document.getElementById('actors').textContent = movie.DIEN_VIEN || 'Đang cập nhật';
+    // --- HÀM 3: LẤY LỊCH CHIẾU ---
+    async function loadShowtimes(id) {
+        try {
+            const res = await fetch(`/api/suat-chieu/${id}`);
+            const result = await res.json();
+            movieShowtimes = (result.success) ? result.data : [];
+            renderShowtimes(datesArray[0]);
+        } catch (e) {
+            console.error("Lỗi lấy lịch chiếu:", e);
+            document.getElementById('cinema-list-container').innerHTML = '<p class="text-danger text-center">Lỗi tải dữ liệu.</p>';
+        }
+    }
 
-                        // Trailer
-                        const trailerUrl = movie.DUONG_DAN_TRAILER;
-                        if (trailerUrl) {
-                            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                            const match = trailerUrl.match(regExp);
-                            if (match) document.getElementById('movie-trailer').src = `https://www.youtube.com/embed/${match[2]}`;
-                        }
+    // --- HÀM 4: HIỂN THỊ RẠP & SUẤT CHIẾU ---
+    function renderShowtimes(selectedDateStr) {
+        const container = document.getElementById('cinema-list-container');
+        container.innerHTML = '';
 
-                        await loadShowtimes(id);
-                    } catch (e) { console.error("Lỗi tải phim:", e); }
-                }
+        // Lọc danh sách rạp có suất chiếu trong ngày đã chọn
+        const showtimesInDay = movieShowtimes.filter(s => (s.NGAY_FORMAT === selectedDateStr || s.NGAY_CHIEU_FORMAT === selectedDateStr));
+        const uniqueCinemas = [...new Set(showtimesInDay.map(s => s.TEN_RAP))];
 
-                // --- HÀM 3: LẤY LỊCH CHIẾU ---
-                async function loadShowtimes(id) {
-                    try {
-                        const res = await fetch(`/api/suat-chieu/${id}`);
-                        const result = await res.json();
-                        movieShowtimes = (result.success) ? result.data : [];
-                        renderShowtimes(datesArray[0]);
-                    } catch (e) {
-                        console.error("Lỗi lấy lịch chiếu:", e);
-                        document.getElementById('cinema-list-container').innerHTML = '<p class="text-danger text-center">Lỗi tải dữ liệu.</p>';
-                    }
-                }
-
-                // --- HÀM 4: HIỂN THỊ RẠP & SUẤT CHIẾU ---
-                function renderShowtimes(selectedDateStr) {
-                    const container = document.getElementById('cinema-list-container');
-                    container.innerHTML = '';
-
-                    // Lọc danh sách rạp có suất chiếu trong ngày đã chọn
-                    const showtimesInDay = movieShowtimes.filter(s => (s.NGAY_FORMAT === selectedDateStr || s.NGAY_CHIEU_FORMAT === selectedDateStr));
-                    const uniqueCinemas = [...new Set(showtimesInDay.map(s => s.TEN_RAP))];
-
-                    if (uniqueCinemas.length === 0) {
-                        container.innerHTML = `
+        if (uniqueCinemas.length === 0) {
+            container.innerHTML = `
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-x text-muted display-4"></i>
                     <p class="mt-3 text-muted">Rất tiếc, ngày này hiện chưa có suất chiếu.</p>
                 </div>`;
-                        return;
-                    }
+            return;
+        }
 
-                    uniqueCinemas.forEach(cinemaName => {
-                        const times = showtimesInDay.filter(s => s.TEN_RAP === cinemaName);
-
-                        let timesHtml = times.map(s => {
-                            const displayTime = s.GIO_FORMAT || (s.GIO_BAT_DAU ? s.GIO_BAT_DAU.substring(0, 5) : "--:--");
-                            return `
+        uniqueCinemas.forEach(cinemaName => {
+            const times = showtimesInDay.filter(s => s.TEN_RAP === cinemaName);
+            
+            let timesHtml = times.map(s => {
+                const displayTime = s.GIO_FORMAT || (s.GIO_BAT_DAU ? s.GIO_BAT_DAU.substring(0, 5) : "--:--");
+                return `
                     <button class="btn btn-outline-dark px-3 py-2 text-start rounded-3 shadow-sm border-light-subtle flex-grow-1 flex-md-grow-0" 
                             onclick="window.location.href='/sodoghe?maSuatChieu=${s.MA_SUAT_CHIEU}'"
                             style="min-width: 100px;">
@@ -302,9 +288,9 @@
                         <div style="font-size: 0.75rem;" class="text-muted">${s.TEN_PHONG_CHIEU}</div>
                     </button>
                 `;
-                        }).join('');
+            }).join('');
 
-                        container.innerHTML += `
+            container.innerHTML += `
                 <div class="mb-4 p-3 border rounded-3 bg-white">
                     <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i>${cinemaName}</h6>
                     <div class="d-flex flex-wrap gap-2">
@@ -312,51 +298,35 @@
                     </div>
                 </div>
             `;
-                    });
-                }
+        });
+    }
 
-                // --- HÀM 5: GỬI ĐÁNH GIÁ ---
-                async function submitReview(e) {
-                    if (e) e.preventDefault();
+    // --- HÀM 5: GỬI ĐÁNH GIÁ ---
+    async function submitReview(e) {
+        e.preventDefault();
+        const ratingInput = document.querySelector('input[name="rating"]:checked');
+        if (!ratingInput) return alert("Vui lòng chọn số sao!");
 
-                    // 1. Lấy ID phim từ Dropdown
-                    const movieSelect = document.querySelector('#modal-review select');
-                    const maPhim = movieSelect ? movieSelect.value : currentMovieId;
-                    // 2. Lấy số sao (Giờ đã có trong modal nên sẽ không bị null nữa)
-                    const ratingInput = document.querySelector('input[name="rating"]:checked');
-                    if (!ratingInput) {
-                        return Swal.fire("Nhắc nhở", "Duy ơi, chưa chọn số sao kìa!", "warning");
-                    }
+        const rating = ratingInput.value;
+        const noiDung = document.getElementById('review-content').value;
 
-                    // 3. Lấy nội dung
-                    const noiDung = document.getElementById('review-content').value;
-                    if (!noiDung.trim()) {
-                        return Swal.fire("Nhắc nhở", "Đừng để trống nội dung nhé!", "warning");
-                    }
-
-                    try {
-                        const response = await fetch('/api/phim/danh-gia', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                maPhim: maPhim,
-                                rating: ratingInput.value,
-                                noiDung: noiDung
-                            })
-                        });
-
-                        const result = await response.json();
-                        if (result.success) {
-                            Swal.fire("Tuyệt vời!", "Đã đăng bài đánh giá thành công.", "success")
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire("Lỗi", result.message, "error");
-                        }
-                    } catch (error) {
-                        console.error("Lỗi fetch:", error);
-                    }
-                }
-            </script>
+        try {
+            const response = await fetch('/api/phim/danh-gia', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maPhim: currentMovieId, rating, noiDung })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert("Đánh giá thành công!");
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error("Lỗi:", error);
+        }
+    }
+</script>
 </body>
-
 </html>

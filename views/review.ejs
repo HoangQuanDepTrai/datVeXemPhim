@@ -4,28 +4,6 @@
 <head>
     <%- include('partials/head') %>
         <title>Review Phim Từ Cộng Đồng - Dunema</title>
-        <style>
-            .star-rating {
-                direction: rtl;
-                unicode-bidi: bidi-override;
-            }
-
-            .star-rating input[type="radio"] {
-                display: none;
-            }
-
-            .star-rating label {
-                color: #ddd;
-                font-size: 2em;
-                cursor: pointer;
-            }
-
-            .star-rating input[type="radio"]:checked~label,
-            .star-rating label:hover,
-            .star-rating label:hover~label {
-                color: #ffc107;
-            }
-        </style>
 </head>
 
 <body class="bg-light text-dark">
@@ -53,7 +31,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 
-                        <form action="/api/phim/danh-gia" method="POST">
+                        <form action="/review-phim/submit" method="POST">
                             <input type="hidden" name="maNguoiDung" id="input-ma-nguoi-dung">
 
                             <div class="modal-body p-4">
@@ -75,24 +53,9 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="fw-bold mb-2 small text-secondary">CẢM NHẬN CỦA BẠN</label>
-                                        <textarea id="review-content" name="noiDung"
-                                            class="form-control bg-light border-0" rows="5" required
+                                        <textarea name="noiDung" class="form-control bg-light border-0" rows="5"
+                                            required
                                             placeholder="Bộ phim này có kịch bản, diễn viên, kỹ xảo như thế nào?..."></textarea>
-                                    </div>
-                                    <div class="mb-3 text-center">
-                                        <label class="form-label d-block fw-bold">BẠN CHẤM PHIM NÀY MẤY SAO?</label>
-                                        <div class="star-rating">
-                                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5"
-                                                title="5 sao">★</label>
-                                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4"
-                                                title="4 sao">★</label>
-                                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3"
-                                                title="3 sao">★</label>
-                                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2"
-                                                title="2 sao">★</label>
-                                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1"
-                                                title="1 sao">★</label>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -100,11 +63,9 @@
                             <div class="modal-footer border-0 bg-light">
                                 <button type="button" class="btn btn-secondary rounded-pill px-4"
                                     data-bs-dismiss="modal">Hủy</button>
-                                <button type="button" id="btn-submit-review"
-                                    class="btn btn-danger rounded-pill px-4 fw-bold" style="display: none;"
-                                    onclick="submitReview(event)">
-                                    Đăng bài
-                                </button>
+                                <button type="submit" id="btn-submit-review"
+                                    class="btn btn-danger rounded-pill px-4 fw-bold" style="display: none;">Đăng
+                                    bài</button>
                             </div>
                         </form>
                     </div>
@@ -132,13 +93,9 @@
                                     </div>
                                 </div>
                                 <div class="text-warning mb-3 fs-6">
-                                    <% for(let i=1; i <=5; i++) { %>
-                                        <% if(i <=review.DIEM) { %>
-                                            <i class="bi bi-star-fill"></i>
-                                            <% } else { %>
-                                                <i class="bi bi-star"></i>
-                                                <% } %>
-                                                    <% } %>
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
+                                        class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
+                                        class="bi bi-star-fill"></i>
                                 </div>
                                 <p class="text-secondary mb-0" style="font-style: italic; line-height: 1.6;">"<%=
                                         review.NOI_DUNG_DANH_GIA %>"</p>
@@ -210,53 +167,6 @@
                             .catch(err => console.error("Lỗi lấy danh sách phim:", err));
                     }
                 });
-                async function submitReview(e) {
-                    if (e) e.preventDefault();
-
-                    // 1. Lấy mã phim từ Select
-                    const selectPhim = document.getElementById('select-phim');
-                    const maPhim = selectPhim.value;
-
-                    // 2. Lấy số sao
-                    const ratingInput = document.querySelector('input[name="rating"]:checked');
-                    if (!ratingInput) {
-                        return Swal.fire("Nhắc nhở", "Duy ơi, chưa chọn số sao kìa!", "warning");
-                    }
-
-                    // 3. Lấy nội dung (Đã có ID review-content)
-                    const noiDung = document.getElementById('review-content').value;
-                    if (!noiDung.trim()) {
-                        return Swal.fire("Nhắc nhở", "Đừng để trống nội dung nhé!", "warning");
-                    }
-
-                    // 4. Lấy mã người dùng từ input ẩn
-                    const maNguoiDung = document.getElementById('input-ma-nguoi-dung').value;
-
-                    try {
-                        const response = await fetch('/api/phim/danh-gia', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                maNguoiDung: maNguoiDung, // Gửi thêm cái này cho Backend
-                                maPhim: maPhim,
-                                rating: ratingInput.value,
-                                noiDung: noiDung
-                            })
-                        });
-
-                        const result = await response.json();
-                        if (result.success) {
-                            Swal.fire("Tuyệt vời!", "Đã đăng bài đánh giá thành công.", "success")
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire("Lỗi", result.message, "error");
-                        }
-                    } catch (error) {
-                        console.error("Lỗi fetch:", error);
-                        Swal.fire("Lỗi", "Không thể kết nối đến máy chủ", "error");
-                    }
-                }
-
             </script>
 </body>
 

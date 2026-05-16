@@ -7,15 +7,16 @@ class SanPhamModel {
         const result = await pool.request().query("SELECT * FROM SAN_PHAM");
         return result.recordset;
     }
-    async addChiTiet(maHD, maSP, soLuong) {
+    async addChiTiet(maHD, maSP, soLuong, giaBan) {
         const pool = await poolPromise;
         await pool.request()
             .input('maHD', sql.Int, maHD)
             .input('maSP', sql.Int, maSP)
             .input('sl', sql.Int, soLuong)
+            .input('gia', sql.Decimal(18, 2), giaBan)
             .query(`
-                INSERT INTO CHI_TIET_HOA_DON (MA_HOA_DON, MA_SAN_PHAM, SO_LUONG)
-                VALUES (@maHD, @maSP, @sl)
+                INSERT INTO CHI_TIET_HOA_DON (MA_HOA_DON, MA_SAN_PHAM, SO_LUONG, GIA_BAN)
+                VALUES (@maHD, @maSP, @sl, @gia)
             `);
     }
 }

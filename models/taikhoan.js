@@ -42,22 +42,12 @@ class TaiKhoanModel {
     async getAll() {
         const pool = await poolPromise;
         const result = await pool.request().query(`
-            SELECT 
-                n.*, 
-                v.TEN_VAI_TRO AS VAI_TRO,  /* Đổi tên cột cho khớp EJS */
-                1 AS TRANG_THAI            /* Giả lập trạng thái hoạt động để không bị lỗi */
+            SELECT n.*, v.TEN_VAI_TRO 
             FROM NGUOI_DUNG n 
             JOIN VAI_TRO v ON n.MA_VAI_TRO = v.MA_VAI_TRO
             ORDER BY n.MA_VAI_TRO ASC, n.MA_NGUOI_DUNG DESC
         `);
         return result.recordset;
-    }
-    async updateStatus(id, newStatus) {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('id', sql.Int, id)
-            .input('status', sql.Int, newStatus)
-            .query(`UPDATE NGUOI_DUNG SET TRANG_THAI = @status WHERE MA_NGUOI_DUNG = @id`);
     }
 }
 module.exports = new TaiKhoanModel();

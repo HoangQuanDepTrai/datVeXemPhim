@@ -76,10 +76,7 @@ class SuatChieuModel {
             .input('maPhong', sql.Int, data.maPhong)
             .input('ngay', sql.Date, data.ngay)
             .query(`
-            SELECT 
-                CONVERT(VARCHAR(5), sc.GIO_BAT_DAU, 108) AS GIO_BAT_DAU, 
-                p.THOI_LUONG_PHIM, 
-                p.TEN_PHIM 
+            SELECT sc.GIO_BAT_DAU, p.THOI_LUONG_PHIM, p.TEN_PHIM 
             FROM SUAT_CHIEU sc
             JOIN PHIM p ON sc.MA_PHIM = p.MA_PHIM
             WHERE sc.MA_PHONG_CHIEU = @maPhong AND sc.NGAY_CHIEU = @ngay
@@ -112,17 +109,12 @@ class SuatChieuModel {
         // 2. Nếu ổn thì mới thêm vào DB
         return await pool.request()
             .input('maPhim', sql.Int, data.maPhim)
-            .input('maRap', sql.Int, data.maRap)     // <--- BỔ SUNG DÒNG NÀY ĐỂ LẤY RẠP
             .input('maPhong', sql.Int, data.maPhong)
             .input('ngay', sql.Date, data.ngay)
             .input('gio', sql.VarChar, data.gio)
             .input('gia', sql.Decimal, data.gia)
-            .query(`
-                INSERT INTO SUAT_CHIEU 
-                (MA_PHIM, MA_RAP, MA_PHONG_CHIEU, NGAY_CHIEU, GIO_BAT_DAU, GIA_VE_CO_BAN, TRANG_THAI) 
-                VALUES 
-                (@maPhim, @maRap, @maPhong, @ngay, @gio, @gia, 1)
-            `);
+            .query(`INSERT INTO SUAT_CHIEU (MA_PHIM, MA_PHONG_CHIEU, NGAY_CHIEU, GIO_BAT_DAU, GIA_VE_CO_BAN, TRANG_THAI) 
+                VALUES (@maPhim, @maPhong, @ngay, @gio, @gia, 1)`);
     }
     async checkDaMuaVe(maND, maPhim) {
         const pool = await poolPromise;
@@ -149,8 +141,7 @@ class SuatChieuModel {
 }
 function convertToMinutes(timeStr) {
     if (!timeStr) return 0;
-    // Ép kiểu chắc chắn về String trước khi split để chống lỗi crash Server
-    const [hours, minutes] = String(timeStr).split(':').map(Number);
+    const [hours, minutes] = timeStr.split(':').map(Number);
     return hours * 60 + minutes;
 }
 

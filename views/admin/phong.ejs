@@ -3,10 +3,13 @@
 
 <head>
     <%- include('../partials/head') %>
+        <meta charset="UTF-8">
+        <title>Quản lý Phòng Chiếu & Sơ Đồ Ghế - Duy Movie</title>
         <link rel="stylesheet" href="/css/admin_dashboard.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- DataTables CSS -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-        <title>Quản lý Phòng Chiếu & Sơ Đồ Ghế</title>
+
         <style>
             .seat-row {
                 display: flex;
@@ -15,158 +18,134 @@
                 margin-bottom: 8px;
             }
 
-            .seat {
-                width: 35px;
-                height: 35px;
-                border-radius: 5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
+            .screen-cinema {
+                width: 70%;
+                margin: 0 auto 40px;
+                padding: 10px;
+                background: #e9ecef;
+                border-radius: 8px;
                 font-weight: bold;
-                color: white;
+                color: #495057;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+            }
+
+            .seat {
+                width: 40px;
+                height: 35px;
+                line-height: 35px;
+                text-align: center;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 0.85rem;
+                cursor: default;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                user-select: none;
             }
 
             .seat-thuong {
                 background-color: #6c757d;
+                color: white;
             }
 
             .seat-vip {
-                background-color: #dc3545;
-                border: 2px solid #ffc107;
-                color: #ffc107;
+                background-color: #ffc107;
+                color: #212529;
             }
 
-            /* --- Style cho phần Tạo ghế trực quan --- */
-            .seat-interactive {
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .seat-interactive:hover {
-                transform: scale(1.1);
-            }
-
-            .seat-trong {
-                background-color: transparent !important;
-                border: 2px dashed #ccc;
-                color: transparent !important;
-                box-shadow: none !important;
-            }
-
-            .screen-area {
-                background: #fff;
-                height: 40px;
-                margin: 0 auto 30px;
-                border-radius: 5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-            }
-
-            #previewMapContainer {
-                max-height: 450px;
-                overflow-y: auto;
+            #seatMapDisplay {
+                background-color: #212529;
+                border-radius: 12px;
+                min-height: 450px;
                 overflow-x: auto;
+                position: relative;
             }
 
-            /* CSS cho ghế bị hỏng / bảo trì */
-            .seat-hong {
-                background-color: #343a40 !important;
-                /* Đen nhạt */
-                color: #6c757d !important;
-                opacity: 0.5;
-                text-decoration: line-through;
-                border: 1px dashed #6c757d !important;
-                cursor: not-allowed;
-            }
-
-            /* CSS khi di chuột vào ghế trong chế độ sửa */
-            .seat-edit-mode {
-                cursor: pointer;
-                transition: transform 0.2s;
-            }
-
-            .seat-edit-mode:hover {
-                transform: scale(1.1);
-                box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
-                /* Tỏa sáng đỏ cảnh báo */
+            /* Căn giữa STT trong bảng */
+            #tablePhong td:first-child {
+                text-align: center;
+                width: 50px;
             }
         </style>
 </head>
 
-<body class="bg-light">
+<body class="bg-light text-dark">
     <%- include('../partials/admin_sidebar') %>
 
-        <div class="main-content mb-5">
-            <div class="top-nav mb-4">
-                <h4 class="fw-bold mb-0">Hệ thống / <small class="text-muted">Phòng Chiếu & Ghế</small></h4>
-            </div>
+        <div class="container mt-4 mb-5">
+            <!-- Khung Giao Diện Chính -->
+            <div class="card shadow-sm border-0 mb-3 rounded-3">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4" style="color: #333;">
+                        Hệ thống <span class="text-secondary fw-normal">/ Phòng Chiếu & Ghế</span>
+                    </h5>
 
-            <!-- Khung Điều Khiển & Hiển Thị -->
-            <div class="card border-0 shadow-sm p-4 rounded-4 mt-4 mb-4">
-                <div class="row g-3 align-items-end mb-4">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">1. Chọn Rạp</label>
-                        <select id="selectRap" class="form-select border-secondary">
-                            <option value="">-- Chọn Rạp --</option>
-                            <% if (typeof raps !=='undefined' ) { %>
-                                <% raps.forEach(rap=> { %>
-                                    <option value="<%= rap._id || rap.MA_RAP %>">
-                                        <%= rap.tenRap || rap.TEN_RAP %>
-                                    </option>
-                                    <% }) %>
-                                        <% } %>
-                        </select>
+                    <!-- Thanh Điều Khiển: Rạp -> Phòng -> Nút -->
+                    <div class="row align-items-end mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small text-dark">1. Chọn Rạp</label>
+                            <select id="selectRap" class="form-select shadow-sm">
+                                <option value="">-- Chọn Rạp --</option>
+                                <% if (typeof raps !=='undefined' && raps.length> 0) { %>
+                                    <% raps.forEach(r=> { %>
+                                        <option value="<%= r.MA_RAP %>">
+                                            <%= r.TEN_RAP %>
+                                        </option>
+                                        <% }) %>
+                                            <% } %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small text-dark">2. Chọn Phòng</label>
+                            <select id="selectPhong" class="form-select shadow-sm" disabled>
+                                <option value="">-- Vui lòng chọn Rạp trước --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex gap-2 pb-1">
+                            <button class="btn btn-primary text-white shadow-sm" id="btnXemSoDo">
+                                <i class="bi bi-eye"></i> Xem Sơ Đồ
+                            </button>
+                            <button class="btn btn-warning text-dark shadow-sm" id="btnTaoSoDo">
+                                <i class="bi bi-grid-3x3"></i> Tạo Sơ Đồ Ghế
+                            </button>
+                            <button class="btn btn-success shadow-sm" id="btnThemPhong">
+                                <i class="bi bi-plus-lg"></i> Thêm Phòng
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">2. Chọn Phòng</label>
-                        <select id="selectPhong" class="form-select border-secondary" disabled>
-                            <option value="">-- Vui lòng chọn Rạp trước --</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 d-flex gap-2">
-                        <button id="btnXemSoDo" class="btn btn-primary fw-bold px-4" disabled>
-                            <i class="bi bi-eye"></i> Xem Sơ Đồ
-                        </button>
-                        <!-- Sửa nút gọi Modal Tạo Ghế Trực Quan -->
-                        <button id="btnTaoSoDo" class="btn btn-warning fw-bold text-dark px-3" data-bs-toggle="modal"
-                            data-bs-target="#modalInteractiveSeats" disabled>
-                            <i class="bi bi-grid-3x3"></i> Tạo Sơ Đồ Ghế
-                        </button>
-                        <button class="btn btn-success fw-bold px-3" data-bs-toggle="modal"
-                            data-bs-target="#modalAddPhong">
-                            <i class="bi bi-plus-lg"></i> Thêm Phòng
-                        </button>
-                    </div>
-                </div>
-                <hr>
 
-                <!-- Màn hình đen xem sơ đồ chính -->
-                <div class="bg-dark rounded-4 p-4 mt-3" style="min-height: 400px; overflow-x: auto;">
-                    <div id="seatMapContainer" class="text-center w-100">
-                        <div class="text-muted py-5 mt-5">
-                            <i class="bi bi-display" style="font-size: 4rem; opacity: 0.5;"></i>
-                            <p class="mt-3 fs-5">Vui lòng chọn Phòng chiếu và bấm "Xem Sơ Đồ"</p>
+                    <hr class="mb-4 text-muted">
+
+                    <!-- Khu Vực Hiển Thị Màn Hình Đen (Sơ Đồ Ghế) -->
+                    <div id="seatMapDisplay" class="p-4 text-center shadow-inner">
+                        <div id="emptyMessage" class="text-muted mt-5 pt-5">
+                            <i class="bi bi-display" style="font-size: 3rem;"></i>
+                            <p class="mt-3">Vui lòng chọn Phòng và nhấn "Xem Sơ Đồ"</p>
+                        </div>
+                        <div id="seatContainer" style="display: none;">
+                            <div class="screen-cinema">MÀN HÌNH</div>
+                            <div id="seatsHTML"></div>
+                            <!-- Chú thích loại ghế -->
+                            <div class="d-flex justify-content-center gap-4 mt-5 text-white">
+                                <div><span class="badge bg-secondary d-inline-block"
+                                        style="width:20px;height:20px;"></span> Ghế Thường</div>
+                                <div><span class="badge bg-warning d-inline-block"
+                                        style="width:20px;height:20px;"></span> Ghế VIP</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Nút Thu/Sổ Danh Sách Phòng -->
-            <div class="text-center mb-3">
+            <!-- Nút Thu/Sổ Danh Sách -->
+            <div class="text-center">
                 <button class="btn btn-outline-secondary rounded-pill px-4 shadow-sm fw-bold" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#collapseDanhSach">
+                    data-bs-toggle="collapse" data-bs-target="#collapseDanhSach" aria-expanded="false">
                     <i class="bi bi-list-ul"></i> Sổ / Thu Danh Sách Tất Cả Phòng Chiếu
                 </button>
             </div>
 
-            <!-- Bảng Danh Sách Phòng -->
-            <div class="collapse mt-3" id="collapseDanhSach">
+            <!-- Bảng Danh Sách Phòng (Collapse) -->
+            <div class="collapse mt-4" id="collapseDanhSach">
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-dark text-white fw-bold py-3">
                         <i class="bi bi-list-task me-2"></i>Danh sách Phòng chiếu trên toàn hệ thống
@@ -175,11 +154,11 @@
                         <table id="tablePhong" class="table table-hover align-middle mb-0 w-100">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="text-center py-3" style="width: 50px;">STT</th>
+                                    <th class="text-center py-3">STT</th>
                                     <th>Tên Phòng</th>
                                     <th>Thuộc Rạp</th>
                                     <th class="text-center">Tổng Số Ghế</th>
-                                    <th class="text-center">Hành động</th> <!-- Thêm lại cột này -->
+                                    <th class="text-center">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -195,22 +174,16 @@
                                             </td>
                                             <td class="text-center">
                                                 <span class="badge bg-danger rounded-pill px-3 py-2">
-                                                    <%= p.TONG_SO_GHE || 0 %> ghế
+                                                    <%= p.TONG_SO_GHE || (p.SO_HANG_GHE * p.SO_COT_GHE) || 0 %> ghế
                                                 </span>
                                             </td>
-                                            <!-- Thêm lại nút bấm -->
                                             <td class="text-center">
+                                                <!-- Nút xem sơ đồ từ danh sách -->
                                                 <button
                                                     class="btn btn-sm btn-info text-white fw-bold shadow-sm btn-xem-sodo-list"
                                                     data-id="<%= p.MA_PHONG_CHIEU %>"
                                                     data-ten="<%= p.TEN_PHONG_CHIEU %>">
                                                     <i class="bi bi-grid-3x3-gap me-1"></i> Xem sơ đồ
-                                                </button>
-                                                <button
-                                                    class="btn btn-sm btn-secondary text-white fw-bold shadow-sm btn-sua-sodo-list mb-1"
-                                                    data-id="<%= p.MA_PHONG_CHIEU %>"
-                                                    data-ten="<%= p.TEN_PHONG_CHIEU %>">
-                                                    <i class="bi bi-tools"></i> Sửa ghế
                                                 </button>
                                             </td>
                                         </tr>
@@ -226,17 +199,202 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-        </div> <!-- End Main Content -->
-        <%- include('../partials/them_phong') %>
-            <%- include('../partials/admin_gheNgoi') %>
-                <!-- Scripts -->
-                <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-                <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                <script src="/js/admin_phong.js"></script>
+        <!-- Modal Thêm Phòng -->
+        <div class="modal fade" id="modalThemPhong" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="formThemPhongMoi">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title fw-bold">Thêm Phòng Chiếu Mới</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="fw-bold form-label">Tên Phòng</label>
+                                <input type="text" id="inputTenPhong" class="form-control" placeholder="VD: Phòng 01"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-success">Lưu Phòng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tạo Sơ Đồ Ghế -->
+        <div class="modal fade" id="modalTaoGhe" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="formTaoSoDoMoi">
+                        <div class="modal-header bg-warning text-dark">
+                            <h5 class="modal-title fw-bold">Tạo Sơ Đồ Ghế Mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-danger small">*Lưu ý: Bạn đang tạo ghế cho phòng được chọn ở ngoài giao diện.
+                            </p>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="fw-bold form-label">Số Hàng (A, B...)</label>
+                                    <input type="number" id="inputSoHang" class="form-control" placeholder="VD: 10"
+                                        min="1" max="26" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="fw-bold form-label">Số Cột (1, 2...)</label>
+                                    <input type="number" id="inputSoCot" class="form-control" placeholder="VD: 12"
+                                        min="1" max="20" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-warning text-dark fw-bold">Khởi Tạo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            $(document).ready(function () {
+                // 1. Khởi tạo DataTable (Danh sách ẩn)
+                if ($('#tablePhong').length) {
+                    const t = $('#tablePhong').DataTable({
+                        "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json" },
+                        "pageLength": 5,
+                        "columnDefs": [
+                            { "searchable": false, "orderable": false, "targets": 0 },
+                            { "orderable": false, "targets": 4 }
+                        ],
+                        "order": [[1, 'asc']]
+                    });
+                    t.on('order.dt search.dt', function () {
+                        let i = 1;
+                        t.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
+                            this.data(i++);
+                        });
+                    }).draw();
+                }
+
+                // 2. Chọn Rạp -> Đổ dữ liệu Phòng
+                $('#selectRap').change(async function () {
+                    const maRap = $(this).val();
+                    const selPhong = $('#selectPhong');
+
+                    if (!maRap) {
+                        selPhong.html('<option value="">-- Vui lòng chọn Rạp trước --</option>').prop('disabled', true);
+                        return;
+                    }
+
+                    selPhong.html('<option value="">Đang tải...</option>').prop('disabled', true);
+
+                    try {
+                        const res = await fetch(`/admin/api/phongs-by-rap/${maRap}`);
+                        const result = await res.json();
+
+                        // Tuyệt chiêu: Trỏ đúng vào biến data chứa mảng danh sách phòng
+                        const danhSachPhong = result.data;
+
+                        if (Array.isArray(danhSachPhong) && danhSachPhong.length > 0) {
+                            let options = '<option value="">-- Chọn Phòng --</option>';
+                            danhSachPhong.forEach(p => {
+                                options += `<option value="${p.MA_PHONG_CHIEU}">${p.TEN_PHONG_CHIEU}</option>`;
+                            });
+                            selPhong.html(options).prop('disabled', false);
+                        } else {
+                            selPhong.html('<option value="">Rạp này chưa có phòng</option>').prop('disabled', true);
+                        }
+                    } catch (err) {
+                        selPhong.html('<option value="">Lỗi tải dữ liệu</option>');
+                    }
+                });
+
+                // 3. Xem Sơ Đồ Ghế
+                $('#btnXemSoDo').click(async function () {
+                    const maPhong = $('#selectPhong').val();
+                    if (!maPhong) return Swal.fire('Lưu ý', 'Vui lòng chọn Phòng trước!', 'warning');
+
+                    $('#emptyMessage').hide();
+                    $('#seatContainer').show();
+                    $('#seatsHTML').html('<div class="spinner-border text-light mt-5"></div>');
+
+                    try {
+                        const response = await fetch(`/admin/phong/${maPhong}/ghe`);
+                        const result = await response.json();
+
+                        if (result.success && result.data.length > 0) {
+                            const seatMap = {};
+                            result.data.forEach(ghe => {
+                                const row = ghe.TEN_GHE_NGOI.charAt(0);
+                                if (!seatMap[row]) seatMap[row] = [];
+                                seatMap[row].push(ghe);
+                            });
+
+                            let html = '';
+                            for (let row in seatMap) {
+                                html += `<div class="seat-row">`;
+                                html += `<div class="text-white" style="width: 30px; line-height: 35px; font-weight: bold; text-align: right; margin-right: 10px;">${row}</div>`;
+
+                                // Sắp xếp theo số
+                                seatMap[row].sort((a, b) => parseInt(a.TEN_GHE_NGOI.substring(1)) - parseInt(b.TEN_GHE_NGOI.substring(1)));
+
+                                seatMap[row].forEach(ghe => {
+                                    const isVip = ghe.GIA_GHE_NGOI == 20000 || (ghe.TRANG_THAI_GHE && ghe.TRANG_THAI_GHE.toLowerCase() === 'vip');
+                                    const seatClass = isVip ? 'seat-vip' : 'seat-thuong';
+                                    html += `<div class="seat ${seatClass}" title="Ghế: ${ghe.TEN_GHE_NGOI}">${ghe.TEN_GHE_NGOI}</div>`;
+                                });
+                                html += `</div>`;
+                            }
+                            $('#seatsHTML').html(html);
+                        } else {
+                            $('#seatsHTML').html('<p class="text-white mt-5 fw-bold fs-5">Phòng này chưa được tạo sơ đồ ghế!</p>');
+                        }
+                    } catch (err) {
+                        $('#seatsHTML').html('<p class="text-danger mt-5">Lỗi kết nối máy chủ!</p>');
+                    }
+                });
+
+                // 4. Mở Modal Thêm Phòng / Tạo Ghế
+                $('#btnThemPhong').click(function () {
+                    if (!$('#selectRap').val()) return Swal.fire('Lưu ý', 'Vui lòng chọn Rạp trước khi thêm phòng!', 'warning');
+                    new bootstrap.Modal(document.getElementById('modalThemPhong')).show();
+                });
+
+                $('#btnTaoSoDo').click(function () {
+                    if (!$('#selectPhong').val()) return Swal.fire('Lưu ý', 'Vui lòng chọn Phòng trước khi tạo ghế!', 'warning');
+                    new bootstrap.Modal(document.getElementById('modalTaoGhe')).show();
+                });
+                // 5. Click "Xem sơ đồ" từ bảng Danh Sách
+                $(document).on('click', '.btn-xem-sodo-list', function () {
+                    const maPhong = $(this).attr('data-id');
+                    const tenPhong = $(this).attr('data-ten');
+
+                    // Mẹo nhỏ: Gán tạm tên phòng vào ô Select để logic của nút btnXemSoDo hoạt động bình thường
+                    $('#selectPhong').html(`<option value="${maPhong}">${tenPhong}</option>`);
+                    $('#selectPhong').val(maPhong);
+
+                    // Tự động kích hoạt nút "Xem Sơ Đồ" ở thanh công cụ phía trên
+                    $('#btnXemSoDo').click();
+
+                    // Hiệu ứng cuộn mượt mà lên khu vực màn hình đen
+                    $('html, body').animate({
+                        scrollTop: $('#seatMapDisplay').offset().top - 50
+                    }, 500);
+                });
+            });
+        </script>
 </body>
 
 </html>

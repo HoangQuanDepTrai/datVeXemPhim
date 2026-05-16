@@ -3,8 +3,6 @@ const params = new URLSearchParams(window.location.search);
 const [maSC, ghesStr, combosStr] = ['maSC', 'ghes', 'combos'].map(k => params.get(k));
 
 let finalTotalAmount = 0;
-// BƯỚC 1: Tạo cái giỏ hàng dùng chung ở đây
-let danhSachComboDaChon = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadUserInfo();
@@ -42,9 +40,7 @@ async function loadOrderDetails() {
         const basePrice = Number(resSC.data?.GIA_VE_CO_BAN) || 0;
         const selectedGheIds = ghesStr ? ghesStr.split(',') : [];
         let htmlRows = "";
-
         finalTotalAmount = 0;
-        danhSachComboDaChon = []; // Reset giỏ hàng mỗi lần load
 
         // 1. NHÓM GHẾ NGỒI (Căn giữa tiêu đề)
         if (resGhe.success && resGhe.data) {
@@ -57,7 +53,7 @@ async function loadOrderDetails() {
                         </td>
                     </tr>`;
                 selectedGhes.forEach(g => {
-                    const phuPhi = Number(g.GIA_GHE_NGOI) || 0;
+                    const phuPhi = Number(g.PHU_PHI_GHE) || 0;
                     const price = basePrice + phuPhi;
                     finalTotalAmount += price;
                     htmlRows += `<tr>
@@ -94,13 +90,6 @@ async function loadOrderDetails() {
                     const subTotal = unitPrice * qty;
                     finalTotalAmount += subTotal;
 
-                    // BƯỚC 2: Gom luôn ID, Số lượng và Giá CẤT VÀO GIỎ HÀNG
-                    danhSachComboDaChon.push({
-                        maSP: Number(id),
-                        soLuong: qty,
-                        giaBan: unitPrice // Lưu chuẩn giá của 1 cái để gửi lên Server
-                    });
-
                     htmlRows += `<tr>
                         <td class="ps-4">${product.TEN_SAN_PHAM}</td>
                         <td class="text-center">${qty}</td>
@@ -111,7 +100,7 @@ async function loadOrderDetails() {
         }
 
         body.innerHTML = htmlRows || '<tr><td colspan="3" class="text-center py-5 text-muted border-0">Đơn hàng trống</td></tr>';
-
+        
         const finalTotalEl = document.getElementById('final-total');
         if (finalTotalEl) {
             finalTotalEl.innerText = finalTotalAmount.toLocaleString('vi-VN') + " VNĐ";
@@ -125,14 +114,13 @@ async function loadOrderDetails() {
 
 async function submitOrder() {
     const user = JSON.parse(localStorage.getItem('user'));
-    const btn = document.getElementById('btnPayment');
+    const btn = document.getElementById('btnPayment'); 
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang xử lý...';
     }
 
     try {
-        // BƯỚC 3: Xóa mấy cái code tách chuỗi lằng nhằng đi, gửi thẳng cái giỏ hàng lên Server
         const res = await fetch('/api/ve/dat-ve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -140,8 +128,7 @@ async function submitOrder() {
                 maNguoiDung: user.MA_NGUOI_DUNG,
                 maSuatChieu: parseInt(maSC),
                 danhSachMaGhe: ghesStr.split(',').map(Number),
-                tongTien: finalTotalAmount,
-                danhSachCombo: danhSachComboDaChon // Đã có sẵn mã, số lượng, giá bán!
+                tongTien: finalTotalAmount
             })
         });
 

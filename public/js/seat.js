@@ -1,3 +1,4 @@
+/* public/js/seat.js */
 // Khởi tạo các biến global
 const urlParams = new URLSearchParams(window.location.search);
 const currentMaSuatChieu = urlParams.get('maSuatChieu') || urlParams.get('id');
@@ -26,12 +27,6 @@ async function loadShowtimeInfo() {
             document.getElementById('display-cinema-room').innerText = `${data.TEN_RAP} - ${data.TEN_PHONG_CHIEU}`;
             document.getElementById('display-time').innerText = `Giờ chiếu: ${data.GIO_FORMAT} - ${data.NGAY_FORMAT}`;
 
-            // --- QUAN TRỌNG: GÁN POSTER VÀO NỀN BODY ---
-            if (data.HINH_ANH_POSTER) {
-                // Gán link ảnh vào biến CSS --poster-url
-                document.body.style.setProperty('--poster-url', `url('${data.HINH_ANH_POSTER}')`);
-            }
-
             // Lưu giá vé cơ bản để tính tiền
             basePrice = parseFloat(data.GIA_VE_CO_BAN) || 0;
         }
@@ -46,7 +41,7 @@ async function loadSeatMap() {
         const res = await fetch(`/api/ghe/sodo/${currentMaSuatChieu}`);
         const result = await res.json();
         const seatMap = document.getElementById('seat-map');
-        seatMap.innerHTML = '';
+        seatMap.innerHTML = ''; // Xóa spinner loading
 
         if (!result.success || !result.data || result.data.length === 0) {
             seatMap.innerHTML = '<div class="alert alert-warning m-5">Phòng chiếu này chưa được thiết lập sơ đồ ghế.</div>';
@@ -80,32 +75,19 @@ async function loadSeatMap() {
             // Vòng lặp vẽ từng ghế trong hàng
             rows[rowLetter].forEach(seat => {
                 const seatDiv = document.createElement('div');
+
                 seatDiv.className = 'seat-item';
+                // Đảm bảo dòng này luôn chạy để gán tên ghế
                 seatDiv.innerText = seat.TEN_GHE_NGOI;
 
-                // Set class VIP nếu có phụ phí
-                if (parseFloat(seat.GIA_GHE_NGOI) > 0) {
+                if (parseFloat(seat.PHU_PHI_GHE) > 0) {
                     seatDiv.classList.add('vip');
                 }
 
-                // ==========================================
-                // KIỂM TRA TRẠNG THÁI GHẾ VÀ CHẶN CLICK
-                // ==========================================
-                const loaiGhe = seat.TRANG_THAI_GHE || 'Thường';
-                const isHong = (loaiGhe.toLowerCase() === 'hỏng' || loaiGhe.toLowerCase() === 'hư hỏng');
-
-                if (isHong) {
-                    // Nếu ghế hỏng -> Chặn màu đen
-                    seatDiv.classList.add('seat-hong');
-                    seatDiv.title = 'Ghế đang bảo trì';
-                } else if (seat.DA_DAT == 1) {
-                    // Nếu ghế đã đặt -> Chặn màu đỏ mờ
+                if (seat.DA_DAT == 1) {
                     seatDiv.classList.add('occupied');
-                    seatDiv.title = 'Ghế đã có người đặt';
                 } else {
-                    // Nếu ghế trống -> Cho phép click
                     seatDiv.classList.add('available');
-                    seatDiv.title = `Ghế ${seat.TEN_GHE_NGOI}`;
                     seatDiv.onclick = () => toggleSeat(seatDiv, seat);
                 }
 
@@ -147,7 +129,7 @@ function updateUI() {
         let listHtml = '<div class="selected-seats-list mt-2">';
 
         selectedSeats.forEach(seat => {
-            const phuPhi = parseFloat(seat.GIA_GHE_NGOI) || 0;
+            const phuPhi = parseFloat(seat.PHU_PHI_GHE) || 0;
             const itemPrice = basePrice + phuPhi;
 
             listHtml += `
@@ -173,15 +155,14 @@ function updateUI() {
 
     // 2. Tính tổng tiền
     const totalTicketPrice = selectedSeats.reduce((sum, seat) => {
-        const phuPhi = parseFloat(seat.GIA_GHE_NGOI) || 0;
+        const phuPhi = parseFloat(seat.PHU_PHI_GHE) || 0;
         return sum + basePrice + phuPhi;
     }, 0);
 
     totalPriceElement.innerText = totalTicketPrice.toLocaleString('vi-VN') + ' VNĐ';
 }
-
 // =========================================================
-// PHẦN CHỌN BẮP NƯỚC VÀ XÁC NHẬN
+// PHẦN CHỌN BẮP NƯỚC VÀ XÁC NHẬN (Copy từ logic cũ của bạn)
 // =========================================================
 let selectedCombos = {};
 
@@ -246,7 +227,7 @@ function updateCombo(id, delta, price) {
 
 function updateFinalTotal() {
     // 1. Tiền ghế
-    const totalGhe = selectedSeats.reduce((sum, s) => sum + basePrice + (parseFloat(s.GIA_GHE_NGOI) || 0), 0);
+    const totalGhe = selectedSeats.reduce((sum, s) => sum + basePrice + (parseFloat(s.PHU_PHI_GHE) || 0), 0);
 
     // 2. Tiền Combo (Đã thêm nhân số lượng)
     let totalCombo = 0;
@@ -271,5 +252,33 @@ function goToPayment() {
         .map(id => `${id}:${selectedCombos[id].qty}`)
         .join('|');
 
-    window.location.href = `/thanhtoan?maSC=${currentMaSuatChieu}&ghes=${seatIds}&combos=${comboData}`;
+    window.location.href = `/api/ve/thanhtoan?maSC=${currentMaSuatChieu}&ghes=${seatIds}&combos=${comboData}`;
+}
+
+// public/js/seat.js
+
+async function loadShowtimeInfo() {
+    try {
+        const res = await fetch(`/api/suat-chieu/thong-tin/${currentMaSuatChieu}`);
+        const result = await res.json();
+
+        if (result.success && result.data) {
+            const data = result.data;
+
+            // Đổ dữ liệu text
+            document.getElementById('display-movie-name').innerText = data.TEN_PHIM;
+            document.getElementById('display-cinema-room').innerText = `${data.TEN_RAP} - ${data.TEN_PHONG_CHIEU}`;
+            document.getElementById('display-time').innerText = `Giờ chiếu: ${data.GIO_FORMAT} - ${data.NGAY_FORMAT}`;
+
+            // --- QUAN TRỌNG: GÁN POSTER VÀO NỀN BODY ---
+            if (data.HINH_ANH_POSTER) {
+                // Gán link ảnh vào biến CSS --poster-url
+                document.body.style.setProperty('--poster-url', `url('${data.HINH_ANH_POSTER}')`);
+            }
+
+            basePrice = parseFloat(data.GIA_VE_CO_BAN) || 0;
+        }
+    } catch (error) {
+        console.error("Lỗi load poster nền:", error);
+    }
 }

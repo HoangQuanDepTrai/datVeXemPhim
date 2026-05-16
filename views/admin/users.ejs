@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <%- include('../partials/head') %>
+        <link rel="stylesheet" href="/css/admin_dashboard.css">
+</head>
+
+<body>
+    <%- include('../partials/admin_sidebar') %>
+        <div class="main-content">
+            <div class="top-nav">
+                <h4 class="fw-bold mb-0">Hệ thống / <small class="text-muted">Người Dùng</small></h4>
+            </div>
+            <div class="card border-0 shadow-sm p-0 rounded-4">
+                <table id="tableUsers" class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">STT</th>
+                            <th>Thành viên</th>
+                            <th>Liên hệ</th>
+                            <th class="text-center">Vai Trò</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(user=> { %>
+                            <tr>
+                                <td class="ps-4 fw-bold"></td>
+                                <td>
+                                    <%= user.HO_TEN %>
+                                </td>
+                                <td>
+                                    <%= user.EMAIL %>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge <%= user.MA_VAI_TRO === 1 ? 'bg-danger' : 'bg-primary' %>">
+                                        <%= user.MA_VAI_TRO===1 ? 'Admin' : 'Khách hàng' %>
+                                    </span>
+                                </td>
+                                <td class="text-center">...</td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</body>
+
+</html>

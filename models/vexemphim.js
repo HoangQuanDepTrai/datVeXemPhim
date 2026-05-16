@@ -90,18 +90,5 @@ class VeModel {
             `);
         return result.recordset;
     }
-    async createChiTietSanPham(maHD, maSP, soLuong, giaBan) {
-        const pool = await poolPromise;
-        await pool.request()
-            .input('maHD', sql.Int, maHD)
-            .input('maSP', sql.Int, maSP)
-            .input('soLuong', sql.Int, soLuong)
-            .input('giaBan', sql.Decimal(18, 2), giaBan)
-            // Nếu Duy muốn lưu cả giá bán thì truyền thêm input('giaBan', ...), ở đây mình tạm bỏ qua cho nhanh
-            .query(`
-                INSERT INTO CHI_TIET_HOA_DON (MA_HOA_DON, MA_SAN_PHAM, SO_LUONG, GIA_BAN) 
-                VALUES (@maHD, @maSP, @soLuong, @giaBan)
-            `);
-    }
 }
 module.exports = new VeModel();

@@ -4,7 +4,7 @@ class GheController {
     getSodoGhe = async (req, res) => {
         try {
             const { maSuatChieu } = req.params;
-            const data = await gheModel.getGheBySuatChieu(maSuatChieu);
+            const data = await gheModel.getBySuatChieu(maSuatChieu);
             res.json({ success: true, data });
         } catch (error) {
             console.error("Lỗi GheController:", error.message);

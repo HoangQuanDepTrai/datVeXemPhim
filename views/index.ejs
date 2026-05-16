@@ -104,7 +104,7 @@
         </div>
 
         <div class="container mb-5">
-            <h2 class="title-border fw-bold mb-4 fs-3" style="color: #a50064;">Tìm phim chiếu rạp trên NoLiCinema</h2>
+            <h2 class="title-border fw-bold mb-4 fs-3" style="color: #a50064;">Tìm phim chiếu rạp trên MoMo</h2>
 
             <div class="filter-wrapper shadow-sm rounded-4 border bg-white p-3 mb-4">
                 <div class="row align-items-center g-3">
@@ -117,17 +117,10 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <select id="genre-filter" class="form-select select-custom bg-light border-0">
-                            <option value="all" selected>Tất cả thể loại</option>
-
-                            <% if (genres && genres.length> 0) { %>
-                                <% genres.forEach(function(item) { %>
-                                    <option value="<%= item.THE_LOAI %>">
-                                        <%= item.THE_LOAI %>
-                                    </option>
-                                    <% }); %>
-                                        <% } %>
-
+                        <select class="form-select select-custom bg-light border-0">
+                            <option selected>Tất cả khu vực</option>
+                            <option>An Giang</option>
+                            <option>Long Xuyên</option>
                         </select>
                     </div>
                     <div class="col-md-4 text-end">
